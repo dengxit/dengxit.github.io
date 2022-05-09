@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar-favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar-favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dengxitong.com","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Travis-CI Hexo？ What Is Continuous Integration (CI) 持续集成是一种经常合并小的代码更改的实践，通过以较小的增量开发和测试来构建更合理的软件开发流程，而Travis CI 则是一个持续集成测试工具 Hexo 是一个快速、简洁且高效的博客框架，也是本博客所使用的框架 Hexo Docs">
+<meta name="keywords" content="Hexo,Travis-CI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Travis-CI+Hexo">
+<meta property="og:url" content="https:&#x2F;&#x2F;dengxitong.com&#x2F;2020&#x2F;03&#x2F;24&#x2F;Travis-CI-hexo&#x2F;index.html">
+<meta property="og:site_name" content="Dengxit&#39;s Blog">
+<meta property="og:description" content="Travis-CI Hexo？ What Is Continuous Integration (CI) 持续集成是一种经常合并小的代码更改的实践，通过以较小的增量开发和测试来构建更合理的软件开发流程，而Travis CI 则是一个持续集成测试工具 Hexo 是一个快速、简洁且高效的博客框架，也是本博客所使用的框架 Hexo Docs">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;Travis.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;DeployKey.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;Sign-up-travis.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;build-success.png">
+<meta property="og:updated_time" content="2022-05-09T07:44:40.500Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;Travis.png">
+
+<link rel="canonical" href="https://dengxitong.com/2020/03/24/Travis-CI-hexo/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Travis-CI+Hexo | Dengxit's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Dengxit's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dengxitong.com/2020/03/24/Travis-CI-hexo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="dengxit">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dengxit's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Travis-CI+Hexo
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-25 01:07:11" itemprop="dateCreated datePublished" datetime="2020-03-25T01:07:11+08:00">2020-03-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-05-09 15:44:40" itemprop="dateModified" datetime="2022-05-09T15:44:40+08:00">2022-05-09</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>579</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="Travis-CI-Hexo？"><a href="#Travis-CI-Hexo？" class="headerlink" title="Travis-CI Hexo？"></a>Travis-CI Hexo？</h4><ul>
+<li><a href="https://docs.travis-ci.com/user/for-beginners/" target="_blank" rel="noopener">What Is Continuous Integration (CI)</a></li>
+<li>持续集成是一种经常合并小的代码更改的实践，通过以较小的增量开发和测试来构建更合理的软件开发流程，而Travis CI 则是一个持续集成测试工具</li>
+<li>Hexo 是一个快速、简洁且高效的博客框架，也是本博客所使用的框架</li>
+<li><a href="https://hexo.io/zh-cn/docs/configuration" target="_blank" rel="noopener">Hexo Docs</a></li>
+</ul>
+<a id="more"></a>
+<h4 id="在github构建hexo项目"><a href="#在github构建hexo项目" class="headerlink" title="在github构建hexo项目"></a>在github构建hexo项目</h4><ul>
+<li>将本地的 “hexoblog” （整个项目的源码）上传至github</li>
+<li>在github 构建 gitpages 项目</li>
+<li>此部分内容可参考 <a href="https://zhuanlan.zhihu.com/p/35668237" target="_blank" rel="noopener">超详细Hexo+Github博客搭建小白教程</a></li>
+</ul>
+<h4 id="部署-Travis-CI"><a href="#部署-Travis-CI" class="headerlink" title="部署 Travis CI"></a>部署 Travis CI</h4><ul>
+<li>建立travis相关文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cd hexoblog #本地 hexoblog 下</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">mkdir .travis</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">touch .travis.yml</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">cd .travis</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">touch ssh_config</span></pre></td></tr></table></figure>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Travis.png" alt=""></li>
+</ul>
+<h4 id="Deploy-Key"><a href="#Deploy-Key" class="headerlink" title="Deploy Key"></a>Deploy Key</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cd ～&#x2F;.ssh</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">#建立的rsa 命名为travis_rsa 以区分</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">cat travis_rsa.pub</span></pre></td></tr></table></figure>
+<p>将控制台输出的密钥拷贝至 “github.io” 项目的 Deploy Key中<br>勾选Allow write access<br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/DeployKey.png" alt=""></p>
+<h4 id="安装Travis"><a href="#安装Travis" class="headerlink" title="安装Travis"></a>安装Travis</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">gem install travis</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">若有报错</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">ERROR:  While executing gem ... (Gem::FilePermissionError)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    You don&#39;t have write permissions for the &#x2F;Library&#x2F;Ruby&#x2F;Gems&#x2F;2.6.0 directory.</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">cd ~&#x2F;Library</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">ll</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">sudo chown -R your_name:your_name &#x2F;Library&#x2F;Ruby&#x2F;Gems&#x2F;2.6.0</span></pre></td></tr></table></figure>
+
+<h4 id="配置Travis"><a href="#配置Travis" class="headerlink" title="配置Travis"></a>配置Travis</h4><p>使用github 账号授权登陆 travis-ci.com<br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Sign-up-travis.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">travis login --pro </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">cd hexoblog&#x2F;.travis</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">travis encrypt-file ~&#x2F;.ssh&#x2F;travis_rsa --add --com</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">#生成了$encrypted_xxxxxxda_key 和 $encrypted_xxxxxxda_iv</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">vi ssh_config</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">#加入</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">Host github.com</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">  User dengxit@gmail.com</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">  StrictHostKeyChecking no</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">  IdentityFile ~&#x2F;.ssh&#x2F;travis_rsa</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">  IdentitiesOnly yes</span></pre></td></tr></table></figure>
+
+<h4 id="配置travis-yml"><a href="#配置travis-yml" class="headerlink" title="配置travis.yml"></a>配置travis.yml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">language: node_js</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">node_js:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">  - stable</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">before_install:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">  # Decrypt the private key</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">  - openssl aes-256-cbc -K $encrypted_xxxxxxda_key -iv $encrypted_xxxxxxda_iv</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">      -in .travis&#x2F;travis_rsa.enc -out ~&#x2F;.ssh&#x2F;travis_rsa -d</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">  # Set the permission of the key</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">  - chmod 600 ~&#x2F;.ssh&#x2F;travis_rsa</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">  # Start SSH agent</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">  - eval $(ssh-agent)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">  # Add the private key to the system</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">  - ssh-add ~&#x2F;.ssh&#x2F;travis_rsa</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">  # Copy SSH config</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">  - cp .travis&#x2F;ssh_config ~&#x2F;.ssh&#x2F;config</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">  # Set Git config</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">  - git config --global user.name &quot;dengxit&quot;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">  - git config --global user.email dengxit@gmail.com</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">  # Install Hexo</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">  - npm install hexo-cli -g</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">  # Clone the repository</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">  - git clone https:&#x2F;&#x2F;github.com&#x2F;dengxit&#x2F;dengxit.github.io .deploy</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">script:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">  - hexo generate</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">  - hexo deploy</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">branches:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">  only:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">    - master</span></pre></td></tr></table></figure>
+<h4 id="项目更新Push成功Build成功"><a href="#项目更新Push成功Build成功" class="headerlink" title="项目更新Push成功Build成功"></a>项目更新Push成功Build成功</h4><p><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/build-success.png" alt=""></p>
+<h4 id="部署过程中的深坑"><a href="#部署过程中的深坑" class="headerlink" title="部署过程中的深坑"></a>部署过程中的深坑</h4><ul>
+<li>Travis CI构建一直提示 iv undefined<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">travis 有两个站点 travis-ci.org 和 travis-ci.com</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">travis login --pro   #travis-ci.com --auto 是 org</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">travis encrypt-file ~&#x2F;.ssh&#x2F;travis_rsa --add --com # --com 代表 travis-ci.com</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">#注意不要弄混了，在执行命令后查看travis 项目设置中是否自动添加了对应的encrypted_xxxxxxda_key 和 encrypted_xxxxxxda_iv</span></pre></td></tr></table></figure></li>
+<li>Travis CI自动构建部署之后，博客页面空白</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">#原因是使用了next主题配置</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">#删除themes&#x2F;next的.git和.gitignore,执行下方命令</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">cd hexoblog</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">git rm --cached themes&#x2F;next</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">git add themes&#x2F;next</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">git push origin master</span></pre></td></tr></table></figure>
+
+<h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><p><a href="https://github.com/levy9527/blog/issues/1" target="_blank" rel="noopener">Github集成TravisCI：自动发布</a><br><a href="https://zespia.tw/blog/2015/01/21/continuous-deployment-to-github-with-travis/" target="_blank" rel="noopener">Travis自动部署网站</a><br><a href="https://researchlab.github.io/2016/05/08/travis-ci-deploy-hexo-blog/" target="_blank" rel="noopener">使用Travis CI自动构建Hexo静态博客</a><br><a href="https://g2ex.top/2019/06/28/hexo-with-travis-ci/" target="_blank" rel="noopener">使用 Travis 自动化部署 Hexo Blog</a><br><a href="https://www.jianshu.com/p/bb9fe3fd45d0" target="_blank" rel="noopener">Mac OS X 下使用 Ruby Gem 的两个坑</a></p>
+<h4 id="Hexo-主题优化"><a href="#Hexo-主题优化" class="headerlink" title="Hexo 主题优化"></a>Hexo 主题优化</h4><p><a href="https://www.jianshu.com/p/3ff20be8574c" target="_blank" rel="noopener">Next主题优化</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+              <a href="/tags/Travis-CI/" rel="tag"># Travis-CI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/20/sqlmode-only-full-group-by/" rel="prev" title="Sql-mode :ONLY_FULL_GROUP_BY">
+      <i class="fa fa-chevron-left"></i> Sql-mode :ONLY_FULL_GROUP_BY
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/27/Sentry-Laravel-Gitlab/" rel="next" title="Sentry-Laravel-Gitlab">
+      Sentry-Laravel-Gitlab <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Travis-CI-Hexo？"><span class="nav-number">1.</span> <span class="nav-text">Travis-CI Hexo？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在github构建hexo项目"><span class="nav-number">2.</span> <span class="nav-text">在github构建hexo项目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署-Travis-CI"><span class="nav-number">3.</span> <span class="nav-text">部署 Travis CI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Deploy-Key"><span class="nav-number">4.</span> <span class="nav-text">Deploy Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装Travis"><span class="nav-number">5.</span> <span class="nav-text">安装Travis</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置Travis"><span class="nav-number">6.</span> <span class="nav-text">配置Travis</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置travis-yml"><span class="nav-number">7.</span> <span class="nav-text">配置travis.yml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#项目更新Push成功Build成功"><span class="nav-number">8.</span> <span class="nav-text">项目更新Push成功Build成功</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署过程中的深坑"><span class="nav-number">9.</span> <span class="nav-text">部署过程中的深坑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考文章"><span class="nav-number">10.</span> <span class="nav-text">参考文章</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hexo-主题优化"><span class="nav-number">11.</span> <span class="nav-text">Hexo 主题优化</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dengxit"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">dengxit</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dengxit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dengxit" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:dengxit@gmail.com" title="E-Mail → mailto:dengxit@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dengxit</span>
+</div>
+<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">琼ICP备18000684号-2</a>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

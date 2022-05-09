@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>双因素认证</title>
+    <url>/2021/08/24/2fa/</url>
+    <content><![CDATA[<h5 id="双因素认证"><a href="#双因素认证" class="headerlink" title="双因素认证"></a>双因素认证</h5><p>在认证用户时系统使用到的凭证即”因素”，常见的认证因素有账号密码，如果只有一种凭证，相当于单因素，双因素即有2种认证因素，本文双因素为密码+ 基于时间的一次性密码算法（TOTP）认证</p>
+<h5 id="TOTP"><a href="#TOTP" class="headerlink" title="TOTP"></a>TOTP</h5><blockquote>
+<p>基于时间的一次性密码算法（TOTP）是一种根据预共享的密钥与当前时间计算一次性密码的算法。它已被互联网工程任务组接纳为RFC 6238标准，成为主动开放认证（OATH）的基石，并被用于众多多重要素验证系统当中</p>
+</blockquote>
+<a id="more"></a>
+
+<p>TOTP有以下几个步骤</p>
+<ul>
+<li>生成用户唯一的密钥</li>
+<li>通过密钥与用户唯一标识（可以是手机号，用户名，邮箱等）生成二维码</li>
+<li>使用专用扫码器扫码获取令牌保存</li>
+<li>登陆时需要同时验证账号密码与保存的扫描器令牌码</li>
+</ul>
+<h5 id="RobThree-TwoFactorAuth"><a href="#RobThree-TwoFactorAuth" class="headerlink" title="RobThree/TwoFactorAuth"></a>RobThree/TwoFactorAuth</h5><p>本文使用了第三方Php拓展包<a href="https://github.com/RobThree/TwoFactorAuth" target="_blank" rel="noopener">RobThree/TwoFactorAuth git 仓库</a></p>
+<h5 id="生成用户密钥"><a href="#生成用户密钥" class="headerlink" title="生成用户密钥"></a>生成用户密钥</h5><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$tfa = <span class="keyword">new</span> RobThree\Auth\TwoFactorAuth();</span></pre></td></tr><tr><td class="code"><pre><span class="line">$secret = $tfa-&gt;createSecret();</span></pre></td></tr></table></figure>
+
+<h5 id="生成二维码"><a href="#生成二维码" class="headerlink" title="生成二维码"></a>生成二维码</h5><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$tfa-&gt;getQRCodeImageAsDataUri(<span class="string">'username'</span>, $secret);</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// RobThree/TwoFactorAuth 使用的是CURL远程地址生成的二维码，国内访问有一定几率连接失败，可以使用另外的二维码生成器驱动</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">QrCode::size(<span class="number">200</span>)-&gt;generate($tfa-&gt;getQRText(<span class="string">'username'</span>,$secret));</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// 调用getQRText方法获得文本再使用自行选择的QrCode生成方案生成二维码即可</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// 本示例使用 simplesoftwareio/simple-qrcode</span></span></pre></td></tr></table></figure>
+<h5 id="使用专用扫码器扫码获取令牌保存"><a href="#使用专用扫码器扫码获取令牌保存" class="headerlink" title="使用专用扫码器扫码获取令牌保存"></a>使用专用扫码器扫码获取令牌保存</h5><p>任意符合标准的扫码器均可 </p>
+<ul>
+<li><p>腾讯身份认证器</p>
+<figure class="third">
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/2fa-1.png" width="200" style="display: inline-block">
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/2fa-2.png" width="200" style="display: inline-block">
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/2fa-3.jpg" width="200" style="display: inline-block">
+</figure>
+</li>
+<li><p>Google Authenticator</p>
+<figure class="third">
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/2fa-4.jpeg" width="200" style="display: inline-block">
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/2fa-5.jpeg" width="200" style="display: inline-block">
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/2fa-6.jpeg" width="200" style="display: inline-block">
+</figure>
+
+</li>
+</ul>
+<h5 id="验证令牌"><a href="#验证令牌" class="headerlink" title="验证令牌"></a>验证令牌</h5><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$tfa-&gt;verifyCode($secret, $code) === <span class="keyword">true</span></span></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
+    <title>Wework</title>
+    <url>/2021/06/03/Wework/</url>
+    <content><![CDATA[<h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><blockquote>
+<p>近期开发了企业微信相关功能，因此编写此文记录开发过程以及期间遇到的各类问题。</p>
+</blockquote>
+<ul>
+<li><a href="https://learnku.com/docs/laravel/8.x" target="_blank" rel="noopener">框架：Laravel 8.0</a></li>
+<li><a href="https://easywechat.com/docs/5.x/overview" target="_blank" rel="noopener">类包：EasyWechat</a></li>
+</ul>
+<a id="more"></a>
+
+<h5 id="企业微信登陆流程"><a href="#企业微信登陆流程" class="headerlink" title="企业微信登陆流程"></a><a href="https://open.work.weixin.qq.com/api/doc/90000/90135/91020" target="_blank" rel="noopener">企业微信登陆流程</a></h5><blockquote>
+<p>企业微信提供了OAuth的授权登录方式，可以让从企业微信终端打开的网页获取成员的身份信息，从而免去登录的环节</p>
+</blockquote>
+<ul>
+<li><a href="https://open.work.weixin.qq.com/api/doc/90000/90135/91022" target="_blank" rel="noopener">构造网页授权链接</a></li>
+</ul>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$config = [</span></pre></td></tr><tr><td class="code"><pre><span class="line">   <span class="string">'corp_id'</span> =&gt; <span class="string">'我的企业&gt;&gt;企业信息&gt;&gt;企业ID'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">   <span class="string">'secret'</span> =&gt; <span class="string">'应用管理&gt;&gt;内部应用&gt;&gt;Secret'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">   <span class="string">'agent_id'</span> =&gt; <span class="string">'应用管理&gt;&gt;内部应用&gt;&gt;AgentId'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">];    </span></pre></td></tr><tr><td class="code"><pre><span class="line">$app = Factory::work($config);</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// $callbackUrl 为授权回调地址,需设置可信域名</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">$callbackUrl = <span class="string">'https://www.test.com/api/wework/callback'</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">$state = <span class="string">'asdfdf-dfdsfdsf-sdf'</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// 携带state获取企业微信跳转目标地址</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//state 可以任意设置凭证以加强安全性，比如设置一个一次核销的uuid使得该链接仅能访问一次，也可以不使用</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">$redirect = $app-&gt;oauth-&gt;withState($state)-&gt;redirect($callbackUrl);</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//$redirect 就是获得的网页授权链接</span></span></pre></td></tr></table></figure>
+<ul>
+<li>服务端Callback</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">//访问上方获取的网页授权链接，会自动跳转https://www.test.com/api/wework/callback?code=CODE&amp;state=STATE</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">$app-&gt;oauth-&gt;detailed()-&gt;userFromCode($code); <span class="comment">//根据code获取企业用户信息</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// 业务处理，用户数据存储，处理state,颁发token</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// 由于项目是前后端分离，所以带token返回给前端</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> redirect()-&gt;away(<span class="string">'前端项目地址'</span>).<span class="string">'?'</span>..http_build_query([<span class="string">'token'</span> =&gt; $token]));</span></pre></td></tr></table></figure>
+<ul>
+<li>跨域问题参考：<ul>
+<li><a href="https://learnku.com/laravel/t/30195" target="_blank" rel="noopener">Learnku案例</a></li>
+<li><a href="https://developers.weixin.qq.com/community/develop/doc/0006eec604cc98a2907b82cb251000?highLine=%25E8%25B7%25A8%25E5%259F%259F" target="_blank" rel="noopener">社区案例</a></li>
+<li><a href="https://www.jianshu.com/p/8dbb69cc91ca" target="_blank" rel="noopener">简书案例</a></li>
+</ul>
+</li>
+</ul>
+<h5 id="通讯录同步"><a href="#通讯录同步" class="headerlink" title="通讯录同步"></a><a href="https://open.work.weixin.qq.com/api/doc/90000/90135/90193" target="_blank" rel="noopener">通讯录同步</a></h5><blockquote>
+<p>通讯录同步相关接口，可以对部门、成员、标签等通讯录信息进行查询、添加、修改、删除等操作。</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$config = [</span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">'corp_id'</span> =&gt; <span class="string">'我的企业&gt;&gt;企业信息&gt;&gt;企业ID'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">'secret'</span> =&gt; <span class="string">'管理工具&gt;&gt;通讯录同步&gt;&gt;Secret'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">];   </span></pre></td></tr><tr><td class="code"><pre><span class="line">$app = Factory::work($config);</span></pre></td></tr><tr><td class="code"><pre><span class="line">$result = $app-&gt;user-&gt;getDetailedDepartmentUsers(<span class="string">'部门ID'</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//批量将result 存入数据库中</span></span></pre></td></tr></table></figure>
+
+
+<h5 id="客户管理"><a href="#客户管理" class="headerlink" title="客户管理"></a><a href="https://open.work.weixin.qq.com/api/doc/90000/90135/92112" target="_blank" rel="noopener">客户管理</a></h5><blockquote>
+<p>企业可通过此接口获取指定成员添加的客户列表。客户是指配置了客户联系功能的成员所添加的外部联系人。没有配置客户联系功能的成员，所添加的外部联系人将不会作为客户返回。</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">//前提 服务端返回agentConfig配置给到前端 ，前端调用SDK获取external_userid</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//获取agentConfig 返回给前端</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">$agent_config = [</span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">'corp_id'</span> =&gt; <span class="string">'我的企业&gt;&gt;企业信息&gt;&gt;企业ID'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">'secret'</span> =&gt; <span class="string">'应用管理&gt;&gt;内部应用&gt;&gt;Secret'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">];</span></pre></td></tr><tr><td class="code"><pre><span class="line">$agent = Factory::work($agent_config);</span></pre></td></tr><tr><td class="code"><pre><span class="line">$agent-&gt;jssdk-&gt;setUrl($url);</span></pre></td></tr><tr><td class="code"><pre><span class="line">$agentConfig = $agent-&gt;jssdk-&gt;buildAgentConfig($apis, $agentId, $debug = <span class="keyword">false</span>, $beta = <span class="keyword">false</span>, $json = <span class="keyword">true</span>, $openTagList = []);</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//前端带agentConfig获取该客户external_userid再调用后端接口</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">$config = [</span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">'corp_id'</span> =&gt; <span class="string">'我的企业&gt;&gt;企业信息&gt;&gt;企业ID'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">'secret'</span> =&gt; <span class="string">'客户联系&gt;&gt;客户&gt;&gt;支持通过API管理客户&gt;&gt;Secret'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">];</span></pre></td></tr><tr><td class="code"><pre><span class="line">$app = Factory::work($config);</span></pre></td></tr><tr><td class="code"><pre><span class="line">$customer = $app-&gt;external_contact-&gt;get($external_userid);</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//业务处理客户信息</span></span></pre></td></tr></table></figure>
+
+<h5 id="事件接收"><a href="#事件接收" class="headerlink" title="事件接收"></a><a href="https://open.work.weixin.qq.com/api/doc/90000/90135/90238" target="_blank" rel="noopener">事件接收</a></h5><blockquote>
+<p>企业可以通过获取成员的客户列表接口来获知成员添加了哪些客户，为了提高实时性，企业可设置外部联系人变更回调，成员添加和删除客户时将以事件的形式推送到指定URL，企业接收到外部联系人变更事件后，响应处理后即可保证获取到的企业客户列表是及时更新的列表。</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$callback_config = [</span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">'corp_id'</span> =&gt; <span class="string">'我的企业&gt;&gt;企业信息&gt;&gt;企业ID'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">'secret'</span> =&gt; <span class="string">'应用管理&gt;&gt;内部应用&gt;&gt;Secret'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">'suite_id'</span> =&gt; <span class="string">'我的企业&gt;&gt;企业信息&gt;&gt;企业ID'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">'suite_secret'</span> =&gt; <span class="string">'应用管理&gt;&gt;内部应用&gt;&gt;Secret'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">'token'</span> =&gt; <span class="string">'企业应用 接收消息服务器配置 token'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">'aes_key'</span> =&gt; <span class="string">'企业应用 接收消息服务器配置 EncodingAESKey'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">];</span></pre></td></tr><tr><td class="code"><pre><span class="line">$callback = Factory::work(<span class="keyword">$this</span>-&gt;callback_config);</span></pre></td></tr><tr><td class="code"><pre><span class="line">$server = $callback-&gt;server;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        $server-&gt;push(<span class="function"><span class="keyword">function</span> <span class="params">($message)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//指令回调</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//            if (isset($message['InfoType'])) &#123;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                switch ($message['InfoType']) &#123;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//推送suite_ticket</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    case 'suite_ticket':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//授权成功通知</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    case 'create_auth':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//变更授权通知</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    case 'cancel_auth':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//通讯录事件通知</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    case 'change_contact': //里可以做通讯录的变动回调，实时监听企业成员变动</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        switch ($message['ChangeType']) &#123;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                            case 'create_user':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                return '新增成员事件';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                            case 'update_user':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                return '更新成员事件';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                            case 'delete_user':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                return '删除成员事件';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                            case 'create_party':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                return '新增部门事件';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                            case 'update_party':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                return '更新部门事件';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                            case 'delete_party':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                return '删除部门事件';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                            case 'update_tag':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                return '标签成员变更事件';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                                break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        &#125;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    default:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        return 'fail';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                &#125;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//            &#125;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//数据回调</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">if</span> (<span class="keyword">isset</span>($message[<span class="string">'MsgType'</span>])) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                <span class="keyword">switch</span> ($message[<span class="string">'MsgType'</span>]) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                    <span class="keyword">case</span> <span class="string">'event'</span>: <span class="comment">//https://work.weixin.qq.com/api/doc/90000/90135/92130#%E7%BC%96%E8%BE%91%E4%BC%81%E4%B8%9A%E5%AE%A2%E6%88%B7%E4%BA%8B%E4%BB%B6</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                        <span class="keyword">switch</span> ($message[<span class="string">'ChangeType'</span>]) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                            <span class="keyword">case</span> <span class="string">'add_external_contact'</span>: <span class="comment">//新增客户</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                            <span class="keyword">case</span> <span class="string">'edit_external_contact'</span>: <span class="comment">//编辑客户</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                                <span class="comment">//做相应业务处理</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                        <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    case 'text':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        return '文本消息';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    case 'image':</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        return '图片消息';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        break;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                    default:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">//                        return '其他消息';</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                        <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        $response = $server-&gt;serve();</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">return</span> $response-&gt;send();</span></pre></td></tr></table></figure>
+
+<p>本地开发调试事件服务器可以使用natapp</p>
+<ul>
+<li><a href="https://natapp.cn/article/wechat_local_debug" target="_blank" rel="noopener">natapp教程</a></li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
+    <title>Laradock-Phpstorm-Xdebug</title>
+    <url>/2021/02/04/Laradock-Phpstorm-Xdebug/</url>
+    <content><![CDATA[<h5 id="Laradock-Env-Setting"><a href="#Laradock-Env-Setting" class="headerlink" title="Laradock Env Setting"></a>Laradock Env Setting</h5><p>确保laradock .env 中workspace和php-fpm的xdebug拓展安装</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">WORKSPACE_INSTALL_XDEBUG&#x3D;true</span></pre></td></tr><tr><td class="code"><pre><span class="line">PHP_FPM_INSTALL_XDEBUG&#x3D;true</span></pre></td></tr></table></figure>
+<p>php-fpm 中安装 xdebug 可调试 Http 请求，比如调试浏览器、Postman 发起的请求，workspace 中安装 xdebug 可以调试 CLI 请求，比如 Artisan 命令、PHP 脚本</p>
+<a id="more"></a>
+
+<p>/laradock/php-fpm/xdebug.ini 设置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#xdebug.remote_enable&#x3D;1</span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.mode&#x3D;debug</span></pre></td></tr><tr><td class="code"><pre><span class="line">#xdebug.remote_host&#x3D;docker.for.mac.localhost</span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.client_host&#x3D;host.docker.internal</span></pre></td></tr><tr><td class="code"><pre><span class="line">#xdebug.remote_port&#x3D;9000</span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.client_port&#x3D;9000</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.remote_autostart&#x3D;1</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.remote_connect_back&#x3D;0</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.remote_handler&#x3D;dbgp</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.max_nesting_level&#x3D;250</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.var_display_max_children&#x3D;-1</span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.var_display_max_data&#x3D;-1</span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.var_display_max_depth&#x3D;-1</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.remote_log&#x3D;&quot;&#x2F;var&#x2F;www&#x2F;xdebug_logs&#x2F;xdebug_docker.log&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">xdebug.idekey&#x3D;PHPSTORM</span></pre></td></tr></table></figure>
+<p>其中带 # 号的配置适用于 Xdebug2 版本 ，对应下方设置适用于 Xdebug3 版本</p>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Xdebug-2-3.png" />
+
+<p>详情见<a href="https://www.jetbrains.com/help/phpstorm/2020.3/configuring-xdebug.html#updatingPhpIni" target="_blank" rel="noopener">Phpstorm 2020.3 Configure Xdebug</a></p>
+<h5 id="Phpstorm-设置"><a href="#Phpstorm-设置" class="headerlink" title="Phpstorm 设置"></a>Phpstorm 设置</h5><ul>
+<li>确保 phpstorm 中 docker 连接成功</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/phpstorm-docker.png" />
+
+<ul>
+<li>配置 php-fpm</li>
+</ul>
+<p>设置cli<br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/phpstorm-php-fpm-1.png" /><br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/phpstorm-php-fpm-2.png" /><br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/phpstorm-php-fpm-3.png" /><br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/phpstorm-php-fpm-4.png" /><br>设置server<br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/phpstorm-php-server-2.png" /></p>
+<ul>
+<li>启动php-fpm下的xdebug</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/php-fpm-xdebug-start.png" />
+
+<ul>
+<li>设置xdebug web page</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/set-web-page-debug-0.png" />
+
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/set-web-page-debug.png" />
+
+<ul>
+<li>代码设置断点</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/set-breakpoint.png" />
+
+<ul>
+<li>phpstorm 中开启监听</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/start-listening.png" />
+
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/go-web-page-debug.png" />
+
+<p>点击按钮会自动跳转到带有XDEBUG_SESSION_START的网址，将对应参数拷贝到postman url后</p>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/postman-request.png" />
+
+<ul>
+<li>postman send request 自动跳转至phpstorm断点处开始调试</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/go-xdebug.png" />
+
+
+
+
+
+
+
+
+
+
+]]></content>
+  </entry>
+  <entry>
+    <title>Laravel-Excel</title>
+    <url>/2020/12/31/Laravel-Excel/</url>
+    <content><![CDATA[<h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><blockquote>
+<p> Laravel Excel is intended at being Laravel-flavoured PhpSpreadsheet: a simple, but elegant wrapper around PhpSpreadsheet with the goal of simplifying exports and imports.</p>
+</blockquote>
+<blockquote>
+<p>Easily export collections to Excel.<br>Export queries with automatic chunking for better performance.<br>Queue exports for better performance.<br>Easily export Blade views to Excel.<br>Easily import to collections.<br>Read the Excel file in chunks.<br>Handle the import inserts in batches.</p>
+</blockquote>
+<p>Laravel Excel 是一个非常契合于Laravel的表格操作工具包，它提供了丰富的操作表格文件方式，可以便捷的操作表格的导入导出</p>
+<a id="more"></a>
+
+<h5 id="项目安装"><a href="#项目安装" class="headerlink" title="项目安装"></a>项目安装</h5><p><a href="https://github.com/Maatwebsite/Laravel-Excel/" target="_blank" rel="noopener">maatwebsite/excel git 仓库</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">composer require maatwebsite&#x2F;excel</span></pre></td></tr></table></figure>
+
+<h5 id="项目文档"><a href="#项目文档" class="headerlink" title="项目文档"></a>项目文档</h5><p><a href="https://docs.laravel-excel.com/3.1/getting-started/" target="_blank" rel="noopener">文档</a></p>
+<h5 id="多sheet的大量数据文件，指定导入其中某个sheet的内容，跳过标题"><a href="#多sheet的大量数据文件，指定导入其中某个sheet的内容，跳过标题" class="headerlink" title="多sheet的大量数据文件，指定导入其中某个sheet的内容，跳过标题"></a>多sheet的大量数据文件，指定导入其中某个sheet的内容，跳过标题</h5><p>├── app<br>│   ├── Http<br>│   │   ├── Controllers<br>│   │   │     ├── UsersController<br>│   ├── Imports<br>│   │   ├── UserFirstSheetImport.php<br>│   │   ├── UserImport.php</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UsersImport</span> <span class="keyword">implements</span> <span class="title">WithMultipleSheets</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="class"></span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// WithConditionalSheets 选择导入的Sheet</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// WithMultipleSheets 多个Sheet表格文件</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">use</span> <span class="title">WithConditionalSheets</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">conditionalSheets</span><span class="params">()</span>: <span class="title">array</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">return</span> [</span></pre></td></tr><tr><td class="code"><pre><span class="line">           <span class="string">'Sheet1'</span> =&gt; <span class="keyword">new</span> UserFirstSheetImport(),  <span class="comment">//'Sheet1'对应sheet名称</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        ];</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFirstSheetImport</span> <span class="keyword">implements</span> <span class="title">ToModel</span>, <span class="title">WithChunkReading</span>, <span class="title">WithBatchInserts</span>, <span class="title">WithStartRow</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="class"></span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">//直接使用Laravel Model 导入</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">model</span><span class="params">(array $row)</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> User([</span></pre></td></tr><tr><td class="code"><pre><span class="line">           <span class="string">'name'</span>     =&gt; $row[<span class="number">0</span>],</span></pre></td></tr><tr><td class="code"><pre><span class="line">           <span class="string">'email'</span>    =&gt; $row[<span class="number">1</span>], </span></pre></td></tr><tr><td class="code"><pre><span class="line">           <span class="string">'password'</span> =&gt; Hash::make($row[<span class="number">2</span>]),</span></pre></td></tr><tr><td class="code"><pre><span class="line">        ]);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">//WithBatchInserts 分批插入</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">batchSize</span><span class="params">()</span>: <span class="title">int</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="number">1000</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">//WithChunkReading 分批读取</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">chunkSize</span><span class="params">()</span>: <span class="title">int</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="number">1000</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">//WithStartRow 设置起始导入行</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">startRow</span><span class="params">()</span>: <span class="title">int</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UsersController</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="class"></span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Import</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        $file = $request-&gt;file(<span class="string">'file'</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            $import = <span class="keyword">new</span> UsersImport();</span></pre></td></tr><tr><td class="code"><pre><span class="line">            $import-&gt;onlySheets(<span class="string">'Sheet1'</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">            Excel::import($import, $file);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125; <span class="keyword">catch</span> (\<span class="keyword">Exception</span> $e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//可以在UserFirstSheetImport处理表格业务数据验证等，报出对应的消息</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">if</span> ($e <span class="keyword">instanceof</span> ExcelImportValidateException) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ExcelImportException($e-&gt;getMessage());</span></pre></td></tr><tr><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ExcelImportException(<span class="string">'请使用给定的excel模版导入'</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//导入成功后可以文件上传OSS留底或者进行其它业务处理</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
+    <title>sql-transaction-nesting</title>
+    <url>/2020/08/04/sql-transaction-nesting/</url>
+    <content><![CDATA[<h5 id="事务嵌套"><a href="#事务嵌套" class="headerlink" title="事务嵌套"></a>事务嵌套</h5><p>最近在业务代码中遇到了Mysql的事务嵌套的情况，伪代码如下</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">A</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         beginTransaction;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         code <span class="number">1</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">         <span class="function"><span class="keyword">function</span> <span class="title">B</span><span class="params">()</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         code <span class="number">2</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">         commit;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      &#125;<span class="keyword">catch</span> ($e)&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         rollBack;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">B</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         beginTransaction;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         code <span class="number">3</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">         commit;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      &#125;<span class="keyword">catch</span> ($e)&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         rollBack;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>疑问：mysql是否支持这种事务嵌套的情况，在遇到这种嵌套情况的时候mysql是如何处理的？</p>
+<a id="more"></a>
+
+
+<h5 id="导致隐式提交的语句"><a href="#导致隐式提交的语句" class="headerlink" title="导致隐式提交的语句"></a>导致隐式提交的语句</h5><p>查找<a href="https://dev.mysql.com/doc/refman/8.0/en/implicit-commit.html" target="_blank" rel="noopener">官方文档</a>发现这样一条说明</p>
+<blockquote>
+<p>The statements listed in this section (and any synonyms for them) implicitly end any transaction active in the current session, as if you had done a COMMIT before executing the statement.</p>
+</blockquote>
+<p>以下语句的执行相当于执行了一遍commit操作：</p>
+<ul>
+<li>DDL语句</li>
+<li>隐式使用或修改mysql数据库中表的语句</li>
+<li>事务控制和锁定语句<br>………</li>
+</ul>
+<p>可以看到「事务控制和锁定语句」会导致隐式提交，也就是说在B方法的beginTransaction语句时之前的内容（code1）就都被commit掉了，那么这个时候数据都已经提交至数据库中了，这样在A方法的code1处的代码如果有数据库操作就无法回滚了，因为已经在B方法中commit了</p>
+<h5 id="解决办法：SAVEPOINT和ROLLBACK-TO-SAVEPOINT"><a href="#解决办法：SAVEPOINT和ROLLBACK-TO-SAVEPOINT" class="headerlink" title="解决办法：SAVEPOINT和ROLLBACK TO SAVEPOINT"></a>解决办法：SAVEPOINT和ROLLBACK TO SAVEPOINT</h5><p><a href="https://dev.mysql.com/doc/refman/8.0/en/savepoint.html" target="_blank" rel="noopener">SAVEPOINT, ROLLBACK TO SAVEPOINT, and RELEASE SAVEPOINT Statements</a></p>
+<blockquote>
+<p>InnoDB supports the SQL statements SAVEPOINT, ROLLBACK TO SAVEPOINT, RELEASE SAVEPOINT and the optional WORK keyword for ROLLBACK.</p>
+</blockquote>
+<p>简而言之就是可以设置一个事务保存点，在提交或者回滚事务的时候也可以指定这个保存点，这样就达成了想要的事务嵌套的效果。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">A</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         beginTransaction;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         SAVEPOINT p1;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         code <span class="number">1</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">         <span class="function"><span class="keyword">function</span> <span class="title">B</span><span class="params">()</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         code <span class="number">2</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">         commit;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      &#125;<span class="keyword">catch</span> ($e)&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">         rollBack to p1;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>而实际上我们项目所使用的框架（Laravel）已经替我们处理掉了这部分内容</p>
+<p>(Laravel framework ^7.0 相关源码)</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">beginTransaction</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//创建一个事务</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;createTransaction();</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//计数器 +1</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;transactions++;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//触发此连接的事件</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;fireConnectionEvent(<span class="string">'beganTransaction'</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">createTransaction</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//如果计数器为0 说明是第一层事务</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;transactions == <span class="number">0</span>) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;reconnectIfMissingConnection();</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//开启事务</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                <span class="keyword">$this</span>-&gt;getPdo()-&gt;beginTransaction();</span></pre></td></tr><tr><td class="code"><pre><span class="line">            &#125; <span class="keyword">catch</span> (Throwable $e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                <span class="keyword">$this</span>-&gt;handleBeginTransactionException($e);</span></pre></td></tr><tr><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125; <span class="keyword">elseif</span> (<span class="keyword">$this</span>-&gt;transactions &gt;= <span class="number">1</span> &amp;&amp; <span class="keyword">$this</span>-&gt;queryGrammar-&gt;supportsSavepoints()) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//如果计数器大于等于 1 且数据库引擎支持SAVEPOINT（innodb）</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="comment">//创建一个事务保存点</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;createSavepoint();</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">createSavepoint</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//计数器+1</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;getPdo()-&gt;exec(</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;queryGrammar-&gt;compileSavepoint(<span class="string">'trans'</span>.(<span class="keyword">$this</span>-&gt;transactions + <span class="number">1</span>))</span></pre></td></tr><tr><td class="code"><pre><span class="line">        );</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">commit</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//提交时判断如果=1说明只有一层事务直接提交即可</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;transactions == <span class="number">1</span>) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;getPdo()-&gt;commit();</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//如果大于1则取这一层事务提交</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;transactions = max(<span class="number">0</span>, <span class="keyword">$this</span>-&gt;transactions - <span class="number">1</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//触发committed相关事件</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;fireConnectionEvent(<span class="string">'committed'</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">rollBack</span><span class="params">($toLevel = null)</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//直接回滚该层事务或回滚指定level层事务</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        $toLevel = is_null($toLevel)</span></pre></td></tr><tr><td class="code"><pre><span class="line">                    ? <span class="keyword">$this</span>-&gt;transactions - <span class="number">1</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                    : $toLevel;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">if</span> ($toLevel &lt; <span class="number">0</span> || $toLevel &gt;= <span class="keyword">$this</span>-&gt;transactions) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//回滚</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;performRollBack($toLevel);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125; <span class="keyword">catch</span> (Throwable $e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;handleRollBackException($e);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//回滚一次更新当前层级</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;transactions = $toLevel;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">//触发rollingBack相关事件</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;fireConnectionEvent(<span class="string">'rollingBack'</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>所以按第一个代码片段的写法也是可以的，不过由于我们的代码用异常捕捉将代码限制了起来，这样的话回滚逻辑就是B方法接收到异常只回滚B方法的这部分操作，不会影响到code1和code2的操作了，如果想要B中捕捉到异常使外层A也一并回滚的话将B方法中的异常捕捉不做处理转由A方法捕捉处理即可。</p>
+]]></content>
+      <tags>
+        <tag>Mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis-Experience</title>
+    <url>/2020/06/16/Redis-Experience/</url>
+    <content><![CDATA[<h4 id="First-Acquaintance-Redis"><a href="#First-Acquaintance-Redis" class="headerlink" title="First Acquaintance Redis"></a>First Acquaintance Redis</h4><ul>
+<li><p>What is Redis</p>
+<blockquote>
+<p>Redis is an open source, in-memory data structure store, used as a database, cache and message broker. It supports data structures such as strings, hashes, lists, sets, sorted sets with range queries etc. Redis has built-in replication, Lua scripting, LRU eviction, transactions and different levels of on-disk persistence, and provides high availability via Redis Sentinel and automatic partitioning with Redis Cluster</p>
+</blockquote>
+</li>
+<li><p>Why use Redis</p>
+<blockquote>
+<p>Blazingly fast<br>High performance &amp; low latency<br>Simplicity while developing complex functionality<br>Compatibility<br>Being used by tech-giants<br>Open source and stable</p>
+</blockquote>
+</li>
+<li><p>How to use Redis</p>
+<ul>
+<li><a href="https://redis.io/documentation" target="_blank" rel="noopener">Redis文档（英）</a></li>
+<li><a href="http://redisdoc.com/" target="_blank" rel="noopener">Redis文档（中）</a></li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<h4 id="业务场景一-：预约业务"><a href="#业务场景一-：预约业务" class="headerlink" title="业务场景一 ：预约业务"></a>业务场景一 ：预约业务</h4><p>用户提交预约时候重复提交或是网络延迟导致的反复提交，可能会生成脏数据；解决办法有很多，例如前端通过触发提交操作时的按钮短暂锁定或是弹层确认，不过设计接口的一个主要准则就是后端不应当完全信任前端提交的数据，因此从后端层面也要加上相应的限制。</p>
+<p>使用Redis的Setnx命令：</p>
+<blockquote>
+<p>只在键 key 不存在的情况下， 将键 key 的值设置为 value 。<br>若键 key 已经存在， 则 SETNX 命令不做任何动作。<br>SETNX 是『SET if Not exists』(如果不存在，则 SET)的简写。<br>命令在设置成功时返回 1 ， 设置失败时返回 0 。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#伪代码（Laravel）</span></pre></td></tr><tr><td class="code"><pre><span class="line">#以业务逻辑相关参数作为key</span></pre></td></tr><tr><td class="code"><pre><span class="line">try&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">   DB::beginTransaction();</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#x2F;&#x2F;看是否被锁，没有则锁上</span></pre></td></tr><tr><td class="code"><pre><span class="line">   $lock &#x3D; Redis::setnx($key, 1); # value根据需求设置 </span></pre></td></tr><tr><td class="code"><pre><span class="line">   if (!$lock) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      &#x2F;&#x2F;to：该预约已提交 请务重复提交</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#x2F;&#x2F;其他业务存储逻辑</span></pre></td></tr><tr><td class="code"><pre><span class="line">   DB::commit();</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#x2F;&#x2F;解锁</span></pre></td></tr><tr><td class="code"><pre><span class="line">   Redis::del($key);</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;catch(\Exception $e)&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#x2F;&#x2F;Log</span></pre></td></tr><tr><td class="code"><pre><span class="line">   DB::rollBack();</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#x2F;&#x2F;解锁</span></pre></td></tr><tr><td class="code"><pre><span class="line">   Redis::del($key);</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h4 id="业务场景二-：消息通知"><a href="#业务场景二-：消息通知" class="headerlink" title="业务场景二 ：消息通知"></a>业务场景二 ：消息通知</h4><p>在特定业务操作下触发消息通知，记录触发者和被通知者，该业务操作非常频繁，并且消息的具体内容数据库有留存，消息通知的记录不需要留底记录，即阅即销；消息需要按照一定的规则进行排序显示一定数量（比如按时间显示最早3条）;</p>
+<p>使用Redis有序集合</p>
+<blockquote>
+<p>将一个或多个 member 元素及其 score 值加入到有序集 key 当中。<br>如果某个 member 已经是有序集的成员，那么更新这个 member 的 score 值，并通过重新插入这个 member 元素，来保证该 member 在正确的位置上。<br>score 值可以是整数值或双精度浮点数。<br>如果 key 不存在，则创建一个空的有序集并执行 ZADD 操作。<br>当 key 存在但不是有序集类型时，返回一个错误。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#伪代码（Laravel）</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">#每当业务触发生成消息</span></pre></td></tr><tr><td class="code"><pre><span class="line">Redis::zadd($key,$sort,$value);</span></pre></td></tr><tr><td class="code"><pre><span class="line">#$key可以以用户ID加特定前缀表示，一个用户的消息频道是一个key集合</span></pre></td></tr><tr><td class="code"><pre><span class="line">#$sort 为设置的排序字段例如时间戳</span></pre></td></tr><tr><td class="code"><pre><span class="line">#$value可以存放关键信息用于查询消息具体内容</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">#获取某个用户的消息频道最新三条消息</span></pre></td></tr><tr><td class="code"><pre><span class="line">public function getLastThirdMessages()</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">       $data &#x3D; [];</span></pre></td></tr><tr><td class="code"><pre><span class="line">       $user &#x3D; Auth::user();</span></pre></td></tr><tr><td class="code"><pre><span class="line">       $key &#x3D; getKey(CacheHelper::CACHE_PREFIX,$user-&gt;id);  #特定用户的key</span></pre></td></tr><tr><td class="code"><pre><span class="line">       $result &#x3D; zrange($key,0,2,&#39;withscores&#39;);  #按sort排序取出集合中最新三条</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">       &#x2F;&#x2F;redis 查询</span></pre></td></tr><tr><td class="code"><pre><span class="line">       if(count($result) &gt; 0)&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">           $data[&#39;count&#39;] &#x3D; zcard($key);      # 统计该用户消息总数</span></pre></td></tr><tr><td class="code"><pre><span class="line">           foreach ($result as $key &#x3D;&gt; $v)&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">               $data[&#39;data&#39;][] &#x3D; self::getDataByRedisKey($key);</span></pre></td></tr><tr><td class="code"><pre><span class="line">           &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">       &#125;else&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">           &#x2F;&#x2F;数据库 查询</span></pre></td></tr><tr><td class="code"><pre><span class="line">               &#x2F;**</span></pre></td></tr><tr><td class="code"><pre><span class="line">               *  </span></pre></td></tr><tr><td class="code"><pre><span class="line">               *   这里查询出来的key再加入缓存 #TODO</span></pre></td></tr><tr><td class="code"><pre><span class="line">               *</span></pre></td></tr><tr><td class="code"><pre><span class="line">               **&#x2F;</span></pre></td></tr><tr><td class="code"><pre><span class="line">       &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">       return $data;</span></pre></td></tr><tr><td class="code"><pre><span class="line">   &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">   </span></pre></td></tr><tr><td class="code"><pre><span class="line"># 对消息确认或者删除</span></pre></td></tr><tr><td class="code"><pre><span class="line">Redis::zRem($key,$value));</span></pre></td></tr></table></figure>
+<h4 id="缓存击穿"><a href="#缓存击穿" class="headerlink" title="缓存击穿"></a>缓存击穿</h4><p>上文在key查询不到时走DB查询再存入缓存，这样可能会出现 缓存击穿 问题</p>
+<blockquote>
+<p>key对应的数据在DB存在，但在redis中不存在，若有大量请求过来，这些请求发现缓存过期一般都会从后端DB加载数据并回设到缓存，这个时候请求过大可能会瞬间把后端DB压垮</p>
+</blockquote>
+<p>解决办法：就是在缓存失效的时候,先使用SETNX尝试能否加缓存，当操作成功时，再进行读取数据库回设缓存</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#上文TODO代码中的简单实现示例</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">if(Redis::setnx($mutex_key, $value))&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    # geyByDB</span></pre></td></tr><tr><td class="code"><pre><span class="line">    # set 缓存</span></pre></td></tr><tr><td class="code"><pre><span class="line">    # del($mutex_key)</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;else&#123;  &#x2F;&#x2F;其他线程setnx成功过了，等待时间从新获取缓存即可</span></pre></td></tr><tr><td class="code"><pre><span class="line">    sleep(1);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    getByKey;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+
+
+]]></content>
+  </entry>
+  <entry>
+    <title>Design-Pattern-Template-Method</title>
+    <url>/2020/05/19/Design-Pattern-Template-Method/</url>
+    <content><![CDATA[<h5 id="模版方法模式"><a href="#模版方法模式" class="headerlink" title="模版方法模式"></a>模版方法模式</h5><blockquote>
+<p>是一种让抽象模板的子类「完成」一系列算法的行为策略<br>  是一种非常适合框架库的算法骨架。用户只需要实现子类的一种方法，其父类便可去搞定这项工作了。<br>  是一种分离具体类的简单办法，且可以减少复制粘贴，这也是它常见的原因。</p>
+</blockquote>
+<a id="more"></a>
+
+<h5 id="Switch-Case代码示例"><a href="#Switch-Case代码示例" class="headerlink" title="Switch Case代码示例"></a>Switch Case代码示例</h5><p>业务场景：打印物品单，不同类型的物品单子格式不同</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">switch</span> ($type) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> fruits:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">print</span> fruits application</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> tools:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">print</span> fruits application</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> consumbles:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">print</span> consumbles application</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     ......</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>如上代码是很快能想到的一种方案，也是最简单易读的处理办法。不过我们会面临这样的问题：不同的单子格式，例如表头，表尾可能是一样的，而单子内容是肯定不同的，这个时候代码可以这样改</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">switch</span> ($type) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> fruits:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          getHeaderAndFooter</span></pre></td></tr><tr><td class="code"><pre><span class="line">          getFruitsCotent</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> tools:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          getHeaderAndFooter</span></pre></td></tr><tr><td class="code"><pre><span class="line">          getToolsCotent</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> consumbles:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          getHeaderAndFooter</span></pre></td></tr><tr><td class="code"><pre><span class="line">          getConsumblesCotent</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     ......</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+<p>其中header和body都是统一的，而各自单子的内容又稍有不同，似乎满足了代码易读性和需求。但是新的需求又来了：每个单子的头尾可能也稍有不同。fruits是一种头尾风格，而tools和consumbles又是另外一种头尾风格（tools和consumbles相同），这时候最容易想到这样处理</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">getHeaderAndBody($type)&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">switch</span> ($type) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">       <span class="keyword">case</span> fruits:</span></pre></td></tr><tr><td class="code"><pre><span class="line">            fruits header footer</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">       <span class="keyword">case</span> tools:</span></pre></td></tr><tr><td class="code"><pre><span class="line">       <span class="keyword">case</span> consumbles:</span></pre></td></tr><tr><td class="code"><pre><span class="line">            tools consumbles header footer</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+<p>这个时候就会发现，要想处理这么多类型不同风格的单子，似乎还得加上更多的类型判断，要是之后又出现更多细化需求，这里的类型可能又要加上一堆的if else来判断。久而久之代码层级就会越来越深，往往维护一个小单子的修改就可能要考虑到对其他单子的影响。</p>
+<h5 id="模版方法模式代码示例"><a href="#模版方法模式代码示例" class="headerlink" title="模版方法模式代码示例"></a>模版方法模式代码示例</h5><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Template-Method.png" />
+
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">switch</span> ($type) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> fruits:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          $fruits = <span class="keyword">new</span> FruitsPage();</span></pre></td></tr><tr><td class="code"><pre><span class="line">          $fruits-&gt;getContent();</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> tools:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          $tools = <span class="keyword">new</span> ToolsPage();</span></pre></td></tr><tr><td class="code"><pre><span class="line">          $tools-&gt;getContent();</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     <span class="keyword">case</span> consumbles:</span></pre></td></tr><tr><td class="code"><pre><span class="line">          $consumbles = <span class="keyword">new</span> ConsumblesPage();</span></pre></td></tr><tr><td class="code"><pre><span class="line">          $consumbles-&gt;getContent();</span></pre></td></tr><tr><td class="code"><pre><span class="line">          <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">     ......</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>如UML图所示，基类中设置了默认的getHeader getFooter方法和抽象方法getContent，每个不同的申请单必须实现自己的getContent设置不同的打印内容，而Header和Footer可以根据需求决定是否在各自类中重写实现。</p>
+]]></content>
+      <tags>
+        <tag>Design-Pattern</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Php-Cs-Fixer+Husky</title>
+    <url>/2020/04/02/php-cs-fixer-husky/</url>
+    <content><![CDATA[<h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><blockquote>
+<p><strong>PHP CS Fixer</strong><br>The PHP Coding Standards Fixer (PHP CS Fixer) tool fixes your code to follow standards; whether you want to follow PHP coding standards as defined in the PSR-1, PSR-2, etc., or other community driven ones like the Symfony one. You can also define your (team’s) style through configuration.<br><strong>Husky</strong><br>Git hooks made easy</p>
+</blockquote>
+<p><code>php-cs-fixer</code> 是一个代码格式修复工具，它可以使你的代码复合各项标准规范或者自定义规则<br><code>husky</code> 是一个<code>git hooks</code> 工具  <a href="https://git-scm.com/book/zh/v2/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-Git-%E9%92%A9%E5%AD%90" target="_blank" rel="noopener">Git Hooks 详见</a></p>
+<a id="more"></a>
+
+
+<h5 id="Laravel-项目安装-php-cs-fixer-husky"><a href="#Laravel-项目安装-php-cs-fixer-husky" class="headerlink" title="Laravel 项目安装 php-cs-fixer husky"></a>Laravel 项目安装 <code>php-cs-fixer</code> <code>husky</code></h5><p><a href="https://github.com/FriendsOfPHP/PHP-CS-Fixer" target="_blank" rel="noopener">php-cs-fixer git 仓库</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">composer require friendsofphp&#x2F;php-cs-fixer</span></pre></td></tr></table></figure>
+<p><a href="https://github.com/typicode/husky" target="_blank" rel="noopener">husky git 仓库</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#注意husky需要 Node &gt;&#x3D; 10 and Git &gt;&#x3D; 2.13.0</span></pre></td></tr><tr><td class="code"><pre><span class="line">npm install husky --save-dev</span></pre></td></tr></table></figure>
+
+<p>在项目的package.json 添加</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&quot;husky&quot;: &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &quot;hooks&quot;: &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            &quot;pre-commit&quot;: &quot;vendor&#x2F;bin&#x2F;php-cs-fixer fix --using-cache&#x3D;no&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>在项目目录下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">touch .php_cs</span></pre></td></tr></table></figure>
+<p><a href="https://gist.githubusercontent.com/ShahinSorkh/f8d9284950f2f073aaa2c2ff11300321/raw/.php_cs" target="_blank" rel="noopener">php_cs内容参考</a></p>
+<p>之后commit前就会触发php_cs自定义的内容对代码格式进行fix</p>
+<p>也可以直接在项目目录运行vendor/bin/php-cs-fixer fix –using-cache=no查看结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Loaded config default from &quot;&#x2F;your_code_file_path&#x2F;.php_cs&quot;.</span></pre></td></tr><tr><td class="code"><pre><span class="line">   1) xxxx.php</span></pre></td></tr><tr><td class="code"><pre><span class="line">   2) xxxx.php</span></pre></td></tr><tr><td class="code"><pre><span class="line">   3) xxxx.php</span></pre></td></tr><tr><td class="code"><pre><span class="line">   # fix的文件</span></pre></td></tr></table></figure>
+
+<h5 id="PhpStorm配置"><a href="#PhpStorm配置" class="headerlink" title="PhpStorm配置"></a>PhpStorm配置</h5><blockquote>
+<p>项目设置了php-cs-fixer后，在phpstorm中会对没有按照规则设置的代码作出警示，可以通过设置一键补全格式</p>
+</blockquote>
+<ul>
+<li><p>设置external tools</p>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/add-external-tools.png" />
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/external-tool-setting.png" />
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#Program 是安装的php-cs-fixer包的位置</span></pre></td></tr><tr><td class="code"><pre><span class="line">#Arguments  fix --verbose --config&#x3D;$ProjectFileDir$&#x2F;.php_cs --path-mode&#x3D;intersection &quot;$ProjectFileDir$&quot;  #该项目路径下放.php_cs配置</span></pre></td></tr><tr><td class="code"><pre><span class="line">#Working diretory 设置常量 $ProjectFileDir$</span></pre></td></tr></table></figure>
+</li>
+<li><p>设置快捷键</p>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/keymap-setting.png" />
+</li>
+<li><p><a href="https://medium.com/hackernoon/how-to-configure-phpstorm-to-use-php-cs-fixer-1844991e521f" target="_blank" rel="noopener">文章参考</a></p>
+</li>
+</ul>
+<h5 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># MacOS 10.15 Catalina</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">dyld: Library not loaded: &#x2F;usr&#x2F;local&#x2F;opt&#x2F;openssl&#x2F;lib&#x2F;libcrypto.1.0.0.dylib</span></pre></td></tr><tr><td class="code"><pre><span class="line">  Referenced from: &#x2F;usr&#x2F;local&#x2F;bin&#x2F;php</span></pre></td></tr><tr><td class="code"><pre><span class="line">  Reason: image not found</span></pre></td></tr><tr><td class="code"><pre><span class="line">  </span></pre></td></tr><tr><td class="code"><pre><span class="line">#解决办法</span></pre></td></tr><tr><td class="code"><pre><span class="line">brew uninstall vapor</span></pre></td></tr><tr><td class="code"><pre><span class="line">brew install vapor&#x2F;tap&#x2F;vapor</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">参考：https:&#x2F;&#x2F;stackoverflow.com&#x2F;questions&#x2F;59006602&#x2F;dyld-library-not-loaded-usr-local-opt-openssl-lib-libssl-1-0-0-dylib</span></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">phpstorm commit没有触发git hooks</span></pre></td></tr><tr><td class="code"><pre><span class="line">在phpstorm的commit 界面查看是否勾选 run git hooks</span></pre></td></tr></table></figure>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/phpstorm-git-hooks.png" width = 256 />
+
+]]></content>
+      <tags>
+        <tag>Git</tag>
+        <tag>Laravel</tag>
+        <tag>Php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Laradock（Docker+Laravel）</title>
+    <url>/2020/04/01/Laradock/</url>
+    <content><![CDATA[<h5 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h5><ul>
+<li><p><a href="https://www.docker.com/" target="_blank" rel="noopener">Docker官网</a></p>
+</li>
+<li><p><a href="http://download.docker.com/mac/stable/Docker.dmg" target="_blank" rel="noopener">Docker Mac 下载</a></p>
+</li>
+</ul>
+<a id="more"></a>
+
+<ul>
+<li>添加Docker阿里云镜像<code>https://5srh0d9d.mirror.aliyuncs.com</code>，重启Docker </li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/docker-desktop.png" width = 256 />
+
+
+<h5 id="SSH-KEY"><a href="#SSH-KEY" class="headerlink" title="SSH KEY"></a>SSH KEY</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd ～&#x2F;.ssh</span></pre></td></tr><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">#建立的rsa 命名为docker_rsa 以区分</span></pre></td></tr><tr><td class="code"><pre><span class="line">cat docker_rsa.pub</span></pre></td></tr><tr><td class="code"><pre><span class="line"># 将公钥设置到你的Gitlab或者Github仓库</span></pre></td></tr><tr><td class="code"><pre><span class="line"># 将私钥公钥拷贝至后续clone下来的Laradock 的workspace目录下并且更名为insecure_id_rsa和insecure_id_rsa.pub</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">vi ~&#x2F;.ssh&#x2F;config</span></pre></td></tr><tr><td class="code"><pre><span class="line">#加入</span></pre></td></tr><tr><td class="code"><pre><span class="line">host xxx.com  #git服务商网址  </span></pre></td></tr><tr><td class="code"><pre><span class="line">    identityFile ~&#x2F;.ssh&#x2F;docker_rsa</span></pre></td></tr><tr><td class="code"><pre><span class="line">    user dengxit@gmail.com #git账号用户名</span></pre></td></tr></table></figure>
+<h5 id="Laradock"><a href="#Laradock" class="headerlink" title="Laradock"></a>Laradock</h5><ul>
+<li><p><a href="http://laradock.io/" target="_blank" rel="noopener">Laradock 官网</a></p>
+</li>
+<li><p><code>git clone https://github.com/Laradock/laradock.git</code></p>
+</li>
+<li><p>clone下来的项目内有非常多的相关环境目录，只保留Laravel运行环境必要的即可</p>
+</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/docker-dev.png" width = 256 />
+
+<h5 id="Laradock-env配置"><a href="#Laradock-env配置" class="headerlink" title="Laradock env配置"></a>Laradock env配置</h5><p><a href="https://github.com/laradock/laradock/blob/master/env-example" target="_blank" rel="noopener">官方ENV</a></p>
+<p>保留我们留下来的相关配置即可，根据自己本地或服务器情况进行相应设置，详情可参考<a href="https://laradock.io/documentation/" target="_blank" rel="noopener">Laradock文档</a></p>
+<p>注意</p>
+<ul>
+<li><p>将“APP_CODE_PATH_HOST=~/GIT”的GIT改为本地项目所在地址或者上一层目录，本地的所有以Docker运行的项目放在次目录下即可</p>
+</li>
+<li><p>设置镜像<br>WORKSPACE_COMPOSER_REPO_PACKAGIST=<a href="https://mirrors.aliyun.com/composer/" target="_blank" rel="noopener">https://mirrors.aliyun.com/composer/</a><br>WORKSPACE_NPM_REGISTRY=<a href="https://registry.npm.taobao.org" target="_blank" rel="noopener">https://registry.npm.taobao.org</a><br>WORKSPACE_NVM_NODEJS_ORG_MIRROR=<a href="https://npm.taobao.org/mirrors/node" target="_blank" rel="noopener">https://npm.taobao.org/mirrors/node</a></p>
+</li>
+</ul>
+<h5 id="docker-compose"><a href="#docker-compose" class="headerlink" title="docker-compose"></a>docker-compose</h5><ul>
+<li>配置项目的docker-compose.yaml文件 （同env 保留我们留下来的目录配置即可）<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">docker-compose build #build镜像</span></pre></td></tr><tr><td class="code"><pre><span class="line">docker-compose up -d #start</span></pre></td></tr><tr><td class="code"><pre><span class="line">docker ps  #查看build后启动的镜像</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="Laravel站点设置"><a href="#Laravel站点设置" class="headerlink" title="Laravel站点设置"></a>Laravel站点设置</h5><ul>
+<li><p>在docker项目nginx/sites下新增项目配置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cp laravel.conf.example demo.conf</span></pre></td></tr></table></figure>
+</li>
+<li><p>修改 conf </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server_name laravel.test;</span></pre></td></tr><tr><td class="code"><pre><span class="line">root &#x2F;var&#x2F;www&#x2F;laravel项目路径&#x2F;public;</span></pre></td></tr></table></figure>
+</li>
+<li><p>本地hosts增加</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1 laravel.test</span></pre></td></tr></table></figure>
+</li>
+<li><p>Laravel env 设置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">将项目的DBHOST改为mysql，REDISHOST改为redis，密码改成docker redis中对应密码</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="Docker-Workspace"><a href="#Docker-Workspace" class="headerlink" title="Docker Workspace"></a>Docker Workspace</h5><p>通过 ssh root@localhost -p 2222连接到workspace中</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd &#x2F;var&#x2F;www </span></pre></td></tr><tr><td class="code"><pre><span class="line">ll  #在容器中查看项目</span></pre></td></tr></table></figure>
+
+<h5 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">No containsers to start ，无容器可启动</span></pre></td></tr><tr><td class="code"><pre><span class="line">docker-compose up -d</span></pre></td></tr></table></figure>
+
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Starting nginx            ... error</span></pre></td></tr><tr><td class="code"><pre><span class="line">netstat -an | grep 80查看80端口，关闭本机运行中的nginx</span></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql端口占用</span></pre></td></tr><tr><td class="code"><pre><span class="line">docker中的mysql和本地mysql服务共同占用了3306端口，将env中端口号改为8306</span></pre></td></tr><tr><td class="code"><pre><span class="line">执行docker-compose up -d --force-recreate --no-deps mysql</span></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">composer install 时提示版本问题</span></pre></td></tr><tr><td class="code"><pre><span class="line">将env中的PHP_VERSION&#x3D;改成需要的版本，rebuild</span></pre></td></tr><tr><td class="code"><pre><span class="line">或者是配置多个workspace 每个workspace中采用不同的php版本</span></pre></td></tr></table></figure>
+
+<h5 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h5><p><a href="https://www.cnblogs.com/liubin0509/p/6178351.html" target="_blank" rel="noopener">compose命令详解</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">--force-recreate       强制重新创建compose服务，即使没有任何改变。重新创建后启动容器</span></pre></td></tr><tr><td class="code"><pre><span class="line">--no-deps             不启动link服务，只启动指定的服务.</span></pre></td></tr></table></figure>
+
+
+<h5 id="多个workspace配置"><a href="#多个workspace配置" class="headerlink" title="多个workspace配置"></a>多个workspace配置</h5><p>当项目变多，并且出现各种不同版本的PHP运行环境时，可以配置多个workspace，每个采用不同的环境设置。</p>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+        <tag>Laravel</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Sentry-Laravel-Gitlab</title>
+    <url>/2020/03/27/Sentry-Laravel-Gitlab/</url>
+    <content><![CDATA[<h5 id="Sentry"><a href="#Sentry" class="headerlink" title="Sentry"></a>Sentry</h5><p><a href="https://sentry.io/welcome/" target="_blank" rel="noopener">Sentry</a>是一个开放源代码错误跟踪系统.<br>GitLab允许管理员将Sentry连接到GitLab，以允许用户查看GitLab中的Sentry错误列表</p>
+<a id="more"></a>
+<h5 id="Sentry-Login"><a href="#Sentry-Login" class="headerlink" title="Sentry-Login"></a>Sentry-Login</h5><p>注册Sentry账号后登陆<br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Sentry-User-Set.png"/></p>
+<h5 id="Sentry-Create-Laravel-Project"><a href="#Sentry-Create-Laravel-Project" class="headerlink" title="Sentry-Create-Laravel-Project"></a>Sentry-Create-Laravel-Project</h5><p>设置 》项目 》创建项目 》Laravel</p>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Sentry-Create-Project.png" />
+
+<h5 id="Sentry-Relate-to-Gitlab"><a href="#Sentry-Relate-to-Gitlab" class="headerlink" title="Sentry-Relate-to-Gitlab"></a>Sentry-Relate-to-Gitlab</h5><p>设置 》集成 》Gitlab 》Add Installation 将Sentry关联至Gitlab仓库</p>
+<p>文档：<a href="https://docs.sentry.io/workflow/integrations/global-integrations/#gitlab" target="_blank" rel="noopener">Sentry-Relate-to-Gitlab</a></p>
+<h5 id="Laravel-Set-Sentry"><a href="#Laravel-Set-Sentry" class="headerlink" title="Laravel-Set-Sentry"></a>Laravel-Set-Sentry</h5><p>在laravel 项目中安装 sentry-laravel 包<br>文档：<a href="https://docs.sentry.io/platforms/php/laravel/" target="_blank" rel="noopener">Laravel-Set-Sentry</a></p>
+<h5 id="Test-Receive"><a href="#Test-Receive" class="headerlink" title="Test-Receive"></a>Test-Receive</h5><p>使用postman在本地对添加的测试接口进行调用就可以在Sentry的项目面板中看到该次报错</p>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Sentry-Test-Receive.png" />
+
+<h5 id="Set-Exception-Level"><a href="#Set-Exception-Level" class="headerlink" title="Set-Exception-Level"></a>Set-Exception-Level</h5><blockquote>
+<p>You can set the severity of an event to one of five values: fatal, error, warning, info, and debug. error is the default, fatal is the most severe and debug is the least severe.</p>
+</blockquote>
+<p>Sentry的默认消息通知发送是error级别的，如果代码中有设置一些诸如逻辑验证的异常抛出应当设立正确的错误级别<br>文档中提供了一种实现方式，这样在handler的异常报告处理时可以根据捕捉到的异常类型设置level</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Sentry\configureScope(function (Sentry\State\Scope $scope): void &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">  $scope-&gt;setLevel(Sentry\Severity::warning());</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;);</span></pre></td></tr></table></figure>
+<p>在 项目&gt;警报 中也可以设置发送警报的规则</p>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Sentry-Alert-Level.png" />
+
+
+
+]]></content>
+      <tags>
+        <tag>Laravel</tag>
+        <tag>Sentry</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Travis-CI+Hexo</title>
+    <url>/2020/03/24/Travis-CI-hexo/</url>
+    <content><![CDATA[<h4 id="Travis-CI-Hexo？"><a href="#Travis-CI-Hexo？" class="headerlink" title="Travis-CI Hexo？"></a>Travis-CI Hexo？</h4><ul>
+<li><a href="https://docs.travis-ci.com/user/for-beginners/" target="_blank" rel="noopener">What Is Continuous Integration (CI)</a></li>
+<li>持续集成是一种经常合并小的代码更改的实践，通过以较小的增量开发和测试来构建更合理的软件开发流程，而Travis CI 则是一个持续集成测试工具</li>
+<li>Hexo 是一个快速、简洁且高效的博客框架，也是本博客所使用的框架</li>
+<li><a href="https://hexo.io/zh-cn/docs/configuration" target="_blank" rel="noopener">Hexo Docs</a></li>
+</ul>
+<a id="more"></a>
+<h4 id="在github构建hexo项目"><a href="#在github构建hexo项目" class="headerlink" title="在github构建hexo项目"></a>在github构建hexo项目</h4><ul>
+<li>将本地的 “hexoblog” （整个项目的源码）上传至github</li>
+<li>在github 构建 gitpages 项目</li>
+<li>此部分内容可参考 <a href="https://zhuanlan.zhihu.com/p/35668237" target="_blank" rel="noopener">超详细Hexo+Github博客搭建小白教程</a></li>
+</ul>
+<h4 id="部署-Travis-CI"><a href="#部署-Travis-CI" class="headerlink" title="部署 Travis CI"></a>部署 Travis CI</h4><ul>
+<li>建立travis相关文件<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd hexoblog #本地 hexoblog 下</span></pre></td></tr><tr><td class="code"><pre><span class="line">mkdir .travis</span></pre></td></tr><tr><td class="code"><pre><span class="line">touch .travis.yml</span></pre></td></tr><tr><td class="code"><pre><span class="line">cd .travis</span></pre></td></tr><tr><td class="code"><pre><span class="line">touch ssh_config</span></pre></td></tr></table></figure>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Travis.png" alt=""></li>
+</ul>
+<h4 id="Deploy-Key"><a href="#Deploy-Key" class="headerlink" title="Deploy Key"></a>Deploy Key</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd ～&#x2F;.ssh</span></pre></td></tr><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">#建立的rsa 命名为travis_rsa 以区分</span></pre></td></tr><tr><td class="code"><pre><span class="line">cat travis_rsa.pub</span></pre></td></tr></table></figure>
+<p>将控制台输出的密钥拷贝至 “github.io” 项目的 Deploy Key中<br>勾选Allow write access<br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/DeployKey.png" alt=""></p>
+<h4 id="安装Travis"><a href="#安装Travis" class="headerlink" title="安装Travis"></a>安装Travis</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gem install travis</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">若有报错</span></pre></td></tr><tr><td class="code"><pre><span class="line">ERROR:  While executing gem ... (Gem::FilePermissionError)</span></pre></td></tr><tr><td class="code"><pre><span class="line">    You don&#39;t have write permissions for the &#x2F;Library&#x2F;Ruby&#x2F;Gems&#x2F;2.6.0 directory.</span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line">cd ~&#x2F;Library</span></pre></td></tr><tr><td class="code"><pre><span class="line">ll</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">sudo chown -R your_name:your_name &#x2F;Library&#x2F;Ruby&#x2F;Gems&#x2F;2.6.0</span></pre></td></tr></table></figure>
+
+<h4 id="配置Travis"><a href="#配置Travis" class="headerlink" title="配置Travis"></a>配置Travis</h4><p>使用github 账号授权登陆 travis-ci.com<br><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Sign-up-travis.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">travis login --pro </span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">cd hexoblog&#x2F;.travis</span></pre></td></tr><tr><td class="code"><pre><span class="line">travis encrypt-file ~&#x2F;.ssh&#x2F;travis_rsa --add --com</span></pre></td></tr><tr><td class="code"><pre><span class="line">#生成了$encrypted_xxxxxxda_key 和 $encrypted_xxxxxxda_iv</span></pre></td></tr><tr><td class="code"><pre><span class="line">vi ssh_config</span></pre></td></tr><tr><td class="code"><pre><span class="line">#加入</span></pre></td></tr><tr><td class="code"><pre><span class="line">Host github.com</span></pre></td></tr><tr><td class="code"><pre><span class="line">  User dengxit@gmail.com</span></pre></td></tr><tr><td class="code"><pre><span class="line">  StrictHostKeyChecking no</span></pre></td></tr><tr><td class="code"><pre><span class="line">  IdentityFile ~&#x2F;.ssh&#x2F;travis_rsa</span></pre></td></tr><tr><td class="code"><pre><span class="line">  IdentitiesOnly yes</span></pre></td></tr></table></figure>
+
+<h4 id="配置travis-yml"><a href="#配置travis-yml" class="headerlink" title="配置travis.yml"></a>配置travis.yml</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">language: node_js</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">node_js:</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - stable</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">before_install:</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Decrypt the private key</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - openssl aes-256-cbc -K $encrypted_xxxxxxda_key -iv $encrypted_xxxxxxda_iv</span></pre></td></tr><tr><td class="code"><pre><span class="line">      -in .travis&#x2F;travis_rsa.enc -out ~&#x2F;.ssh&#x2F;travis_rsa -d</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Set the permission of the key</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - chmod 600 ~&#x2F;.ssh&#x2F;travis_rsa</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Start SSH agent</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - eval $(ssh-agent)</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Add the private key to the system</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - ssh-add ~&#x2F;.ssh&#x2F;travis_rsa</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Copy SSH config</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - cp .travis&#x2F;ssh_config ~&#x2F;.ssh&#x2F;config</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Set Git config</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - git config --global user.name &quot;dengxit&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - git config --global user.email dengxit@gmail.com</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Install Hexo</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - npm install hexo-cli -g</span></pre></td></tr><tr><td class="code"><pre><span class="line">  # Clone the repository</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - git clone https:&#x2F;&#x2F;github.com&#x2F;dengxit&#x2F;dengxit.github.io .deploy</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">script:</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - hexo generate</span></pre></td></tr><tr><td class="code"><pre><span class="line">  - hexo deploy</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">branches:</span></pre></td></tr><tr><td class="code"><pre><span class="line">  only:</span></pre></td></tr><tr><td class="code"><pre><span class="line">    - master</span></pre></td></tr></table></figure>
+<h4 id="项目更新Push成功Build成功"><a href="#项目更新Push成功Build成功" class="headerlink" title="项目更新Push成功Build成功"></a>项目更新Push成功Build成功</h4><p><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/build-success.png" alt=""></p>
+<h4 id="部署过程中的深坑"><a href="#部署过程中的深坑" class="headerlink" title="部署过程中的深坑"></a>部署过程中的深坑</h4><ul>
+<li>Travis CI构建一直提示 iv undefined<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">travis 有两个站点 travis-ci.org 和 travis-ci.com</span></pre></td></tr><tr><td class="code"><pre><span class="line">travis login --pro   #travis-ci.com --auto 是 org</span></pre></td></tr><tr><td class="code"><pre><span class="line">travis encrypt-file ~&#x2F;.ssh&#x2F;travis_rsa --add --com # --com 代表 travis-ci.com</span></pre></td></tr><tr><td class="code"><pre><span class="line">#注意不要弄混了，在执行命令后查看travis 项目设置中是否自动添加了对应的encrypted_xxxxxxda_key 和 encrypted_xxxxxxda_iv</span></pre></td></tr></table></figure></li>
+<li>Travis CI自动构建部署之后，博客页面空白</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#原因是使用了next主题配置</span></pre></td></tr><tr><td class="code"><pre><span class="line">#删除themes&#x2F;next的.git和.gitignore,执行下方命令</span></pre></td></tr><tr><td class="code"><pre><span class="line">cd hexoblog</span></pre></td></tr><tr><td class="code"><pre><span class="line">git rm --cached themes&#x2F;next</span></pre></td></tr><tr><td class="code"><pre><span class="line">git add themes&#x2F;next</span></pre></td></tr><tr><td class="code"><pre><span class="line">git push origin master</span></pre></td></tr></table></figure>
+
+<h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><p><a href="https://github.com/levy9527/blog/issues/1" target="_blank" rel="noopener">Github集成TravisCI：自动发布</a><br><a href="https://zespia.tw/blog/2015/01/21/continuous-deployment-to-github-with-travis/" target="_blank" rel="noopener">Travis自动部署网站</a><br><a href="https://researchlab.github.io/2016/05/08/travis-ci-deploy-hexo-blog/" target="_blank" rel="noopener">使用Travis CI自动构建Hexo静态博客</a><br><a href="https://g2ex.top/2019/06/28/hexo-with-travis-ci/" target="_blank" rel="noopener">使用 Travis 自动化部署 Hexo Blog</a><br><a href="https://www.jianshu.com/p/bb9fe3fd45d0" target="_blank" rel="noopener">Mac OS X 下使用 Ruby Gem 的两个坑</a></p>
+<h4 id="Hexo-主题优化"><a href="#Hexo-主题优化" class="headerlink" title="Hexo 主题优化"></a>Hexo 主题优化</h4><p><a href="https://www.jianshu.com/p/3ff20be8574c" target="_blank" rel="noopener">Next主题优化</a></p>
+]]></content>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>Travis-CI</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Sql-mode :ONLY_FULL_GROUP_BY</title>
+    <url>/2020/03/20/sqlmode-only-full-group-by/</url>
+    <content><![CDATA[<h5 id="ONLY-FULL-GROUP-BY-引起的一个问题"><a href="#ONLY-FULL-GROUP-BY-引起的一个问题" class="headerlink" title="ONLY_FULL_GROUP_BY 引起的一个问题"></a>ONLY_FULL_GROUP_BY 引起的一个问题</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Column &#39;XXXX&#39; is invalid in the select list because it is not contained in </span></pre></td></tr><tr><td class="code"><pre><span class="line">either an aggregate function or the GROUP BY clause.</span></pre></td></tr></table></figure>
+<p>这是由于Mysql的 Sql-mode 设置ONLY_FULL_GROUP_BY导致的，在解决这个问题前首先要了解Mysql的Sql-mode</p>
+<a id="more"></a>
+<h5 id="Sql-mode-介绍"><a href="#Sql-mode-介绍" class="headerlink" title="Sql-mode 介绍"></a>Sql-mode 介绍</h5><ul>
+<li><a href="https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-changes" target="_blank" rel="noopener">MySql 5.7 Sql-mode</a></li>
+<li><a href="https://dev.mysql.com/doc/refman/5.7/en/group-by-handling.html" target="_blank" rel="noopener">MySql Handling of GROUP BY</a></li>
+</ul>
+<h6 id="在文档中我们可以看到"><a href="#在文档中我们可以看到" class="headerlink" title="在文档中我们可以看到"></a>在文档中我们可以看到</h6><p>以下的Sql语句在ONLY_FULL_GROUP_BY模式下会出错</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT name, address, MAX(age) FROM t GROUP BY name;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">ERROR 1055 (42000): Expression #2 of SELECT list is not in GROUP</span></pre></td></tr><tr><td class="code"><pre><span class="line">BY clause and contains nonaggregated column &#39;mydb.t.address&#39; which</span></pre></td></tr><tr><td class="code"><pre><span class="line">is not functionally dependent on columns in GROUP BY clause; this</span></pre></td></tr><tr><td class="code"><pre><span class="line">is incompatible with sql_mode&#x3D;ONLY_FULL_GROUP_BY</span></pre></td></tr></table></figure>
+<p>原因是 address 没有位于 GROUP BY 列中，也没有使用聚合函数；但是如果 name 是t表的主键或者是唯一的NOT NULL 列，那么这个查询是有效的，因为Mysql可以认识到select所选择的列在功能上取决于group by的列，name若为主键，则它可以确定唯一的对应address，这样就不会产生随机性。</p>
+<h4 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h4><ul>
+<li>确定业务逻辑上 name 对应唯一的 address 可以使用 ANY_VALUE</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT name, ANY_VALUE(address), MAX(age) FROM t GROUP BY name;</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>根据业务逻辑可以 为 address 这样的字段 加上聚合函数</p>
+</li>
+<li><p>关闭 ONLY_FULL_GROUP_BY。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT @@sql_mode;</span></pre></td></tr><tr><td class="code"><pre><span class="line">SET sql_mode &#x3D;&#39;xxxxxx,xxxxxx&#39; #去除ONLY_FULL_GROUP_BY</span></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>Mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>bash</title>
+    <url>/2019/12/26/bash/</url>
+    <content><![CDATA[<h5 id="jq"><a href="#jq" class="headerlink" title="jq"></a>jq</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;jqplay.org&#x2F;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;stedolan.github.io&#x2F;jq&#x2F;manual&#x2F;#Basicfilters</span></pre></td></tr></table></figure>
+
+
+<h5 id="管道的操作符"><a href="#管道的操作符" class="headerlink" title="管道的操作符 |"></a>管道的操作符 |</h5><p>前一条指令的输出流向会作为后一条指令的标准输入</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ls | grep  &quot;Android&quot;</span></pre></td></tr></table></figure>
+
+
+<h5 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set -ex</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">-x 运行结果之前，先输出执行的那一行命令</span></pre></td></tr><tr><td class="code"><pre><span class="line">-e 脚本只要发生错误，就终止执行</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;blog&#x2F;2017&#x2F;11&#x2F;bash-set.html</span></pre></td></tr></table></figure>
+
+
+<h5 id="Sed"><a href="#Sed" class="headerlink" title="Sed"></a>Sed</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sed &#39;s&#x2F;要被取代的字串&#x2F;新的字串&#x2F;g&#39;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">echo &#39;test&#x2F;1.x&#39;&#39; | sed &#39;s&#x2F;tag\&#x2F;&#x2F;&#x2F;&#39; |tr &#39;.&#39; &#39; &#39;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">#输出</span></pre></td></tr><tr><td class="code"><pre><span class="line">1 x</span></pre></td></tr></table></figure>
+
+<h5 id="文件测试运算符"><a href="#文件测试运算符" class="headerlink" title="文件测试运算符"></a>文件测试运算符</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-b file	检测文件是否是块设备文件，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-c file	检测文件是否是字符设备文件，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-d file	检测文件是否是目录，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-f file	检测文件是否是普通文件（既不是目录，也不是设备文件），如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-g file	检测文件是否设置了 SGID 位，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-k file	检测文件是否设置了粘着位(Sticky Bit)，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-p fill	检测文件是否是命名管道，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-u file	检测文件是否设置了 SUID 位，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-r file	检测文件是否可读，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-w file	检测文件是否可写，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-x file	检测文件是否可执行，如果是，则返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-s file	检测文件是否为空（文件大小是否大于0），不为空返回 true</span></pre></td></tr><tr><td class="code"><pre><span class="line">-e file	检测文件（包括目录）是否存在，如果是，则返回 true</span></pre></td></tr></table></figure>
+
+<h5 id="输出重定向"><a href="#输出重定向" class="headerlink" title="输出重定向"></a>输出重定向</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2&gt;&amp;1  意思是把 标准错误输出 重定向到 标准输出.</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#x2F;dev&#x2F;null是一个文件，这个文件比较特殊，所有传给它的东西它都丢弃掉</span></pre></td></tr></table></figure>
+
+<h5 id="screen"><a href="#screen" class="headerlink" title="screen"></a>screen</h5><blockquote>
+<p>只要Screen本身没有终止，在其内部运行的会话都可以恢复。这一点对于远程登录的用户特别有用——即使网络连接中断，用户也不会失去对已经打开的命令行会话的控制。只要再次登录到主机上执行screen -r就可以恢复会话的运行。同样在暂时离开的时候，也可以执行分离命令detach，在保证里面的程序正常运行的情况下让Screen挂起（切换到后台）</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">screen -S example  #开启一个名为 example 的 screen</span></pre></td></tr><tr><td class="code"><pre><span class="line">control A 再按 D # 离开当前的screen，放入后台执行</span></pre></td></tr><tr><td class="code"><pre><span class="line">screen -ls  #展示当前挂载的所有screen</span></pre></td></tr><tr><td class="code"><pre><span class="line">screen -r example #回到 example screen</span></pre></td></tr><tr><td class="code"><pre><span class="line">control D #将该作业结束</span></pre></td></tr><tr><td class="code"><pre><span class="line">screen -wipe #检查并删除无法使用的screen</span></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>bash</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>site-list</title>
+    <url>/2019/12/20/site-list/</url>
+    <content><![CDATA[<ul>
+<li><a href="https://github.com/qinjx/30min_guides/blob/master/shell.md" target="_blank" rel="noopener">30分钟快速了解bash</a></li>
+<li><a href="https://learnku.com/docs/php-design-patterns/2018/php-design-pattern-reading-list/1525" target="_blank" rel="noopener">设计模式（PHP）</a></li>
+<li><a href="https://refactoringguru.cn/design-patterns" target="_blank" rel="noopener">设计模式</a></li>
+<li><a href="https://tool.chinaz.com/tools/unixtime.aspx" target="_blank" rel="noopener">在线时间戳</a></li>
+<li><a href="https://www.hipdf.com/" target="_blank" rel="noopener">在线PDF工具</a></li>
+<li><a href="https://xclient.info/" target="_blank" rel="noopener">MAC应用分享</a></li>
+<li><a href="https://wangdoc.com/javascript/index.html" target="_blank" rel="noopener">Javascript基础教程</a></li>
+<li><a href="https://es6.ruanyifeng.com/#docs/intro" target="_blank" rel="noopener">ES6入门</a></li>
+<li><a href="https://learnku.com/php/t/7609/you-have-to-know-17-composer-best-practices-updated-to-22" target="_blank" rel="noopener">composer 最佳实践</a></li>
+<li><a href="https://jex.im/regulex" target="_blank" rel="noopener">正则可视化</a></li>
+<li><a href="https://any86.github.io/any-rule/" target="_blank" rel="noopener">常用正则大全</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/1533688" target="_blank" rel="noopener">Mysql 行转列</a></li>
+<li><a href="https://www.bilibili.com/video/av88646573/" target="_blank" rel="noopener">网站推荐合集</a></li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
+    <title>Git</title>
+    <url>/2019/05/25/Git/</url>
+    <content><![CDATA[<h5 id="Git教程"><a href="#Git教程" class="headerlink" title="Git教程"></a>Git教程</h5><ul>
+<li><a href="https://www.liaoxuefeng.com/wiki/896043488029600" target="_blank" rel="noopener">liaoxuefeng</a></li>
+<li><a href="https://git-scm.com/book/zh/v2" target="_blank" rel="noopener">git-book</a></li>
+</ul>
+<h5 id="Git流程简记"><a href="#Git流程简记" class="headerlink" title="Git流程简记"></a>Git流程简记</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.新建issue</span></pre></td></tr><tr><td class="code"><pre><span class="line">2.根据issue号在本地基于master切issue-XXXX分支:git checkout -b issue-XXXX</span></pre></td></tr><tr><td class="code"><pre><span class="line">3.开发&amp;本地测试</span></pre></td></tr><tr><td class="code"><pre><span class="line">4.git status</span></pre></td></tr><tr><td class="code"><pre><span class="line">5.git add .</span></pre></td></tr><tr><td class="code"><pre><span class="line">6.git commit -m &quot;add: XXXXXXXX. close #XXXX&quot;(add,fix,opt... #后的XXXX对应issue号)</span></pre></td></tr><tr><td class="code"><pre><span class="line">7.git push origin issue-XXXX</span></pre></td></tr><tr><td class="code"><pre><span class="line">8.提pr，跑ci，申请review，不通过接着改，循环3-&gt;7</span></pre></td></tr><tr><td class="code"><pre><span class="line">9.通过，被merge，issue关闭；</span></pre></td></tr><tr><td class="code"><pre><span class="line">10.出现bug，重开关闭的issue，基于master切bug分支:git checkout -b issue-XXXX-1(无bug则跳过10，11两步)</span></pre></td></tr><tr><td class="code"><pre><span class="line">11.循环3-6，git push origin issue-XXXX-1</span></pre></td></tr><tr><td class="code"><pre><span class="line">12.git checkout master</span></pre></td></tr><tr><td class="code"><pre><span class="line">13.git pull</span></pre></td></tr><tr><td class="code"><pre><span class="line">14.循环1-9开发新功能</span></pre></td></tr></table></figure>
+<a id="more"></a>
+<h5 id="Github初始化设置"><a href="#Github初始化设置" class="headerlink" title="Github初始化设置"></a>Github初始化设置</h5><ul>
+<li>生成 ssh key<br>ssh-keygen -t rsa -C “<a href="mailto:dengxit@gmail.com" target="_blank" rel="noopener">dengxit@gmail.com</a>“</li>
+<li>将sshkey添加到github设置中</li>
+<li>测试连接<br>ssh -T <a href="mailto:git@github.com" target="_blank" rel="noopener">git@github.com</a><br>ssh-add ~/.ssh/github_rsa （链接失败执行）</li>
+<li>github新建一个项目</li>
+<li>本地新建一个项目<br>git init<br>git remote add github XXXXXXXX/XXX.git<br>git add .<br>git push origin master</li>
+</ul>
+<h5 id="cherry-pick"><a href="#cherry-pick" class="headerlink" title="cherry_pick"></a>cherry_pick</h5> <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#在当前分支将某个分支上特定的commit更改拉到当前分支</span></pre></td></tr><tr><td class="code"><pre><span class="line">git cherry-pick commit-sha1</span></pre></td></tr></table></figure>
+
+<h5 id="撤销-最后-一次错误的commit"><a href="#撤销-最后-一次错误的commit" class="headerlink" title="撤销 最后 一次错误的commit"></a>撤销 最后 一次错误的commit</h5><ul>
+<li>有多个个commit如下<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">commit4</span></pre></td></tr><tr><td class="code"><pre><span class="line">commit3</span></pre></td></tr><tr><td class="code"><pre><span class="line">commit2</span></pre></td></tr><tr><td class="code"><pre><span class="line">commit1</span></pre></td></tr></table></figure></li>
+<li>如果commit4 已经提交 ，想要撤销，执行如下操作<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git reset --hard HEAD~1</span></pre></td></tr><tr><td class="code"><pre><span class="line">git push --force</span></pre></td></tr></table></figure></li>
+<li>这样commit4就被撤销了。不过如果commit4后有commit5提交，在强制推送后commit5也会消失</li>
+</ul>
+<h5 id="测试环境冲突"><a href="#测试环境冲突" class="headerlink" title="测试环境冲突"></a>测试环境冲突</h5><p>示例</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pro          ---&gt;    branch-1</span></pre></td></tr><tr><td class="code"><pre><span class="line">branch -1    ---&gt;    staging   (conflicts)    branch-1  ----&gt; pro (no-conflicts)</span></pre></td></tr><tr><td class="code"><pre><span class="line">解决：</span></pre></td></tr><tr><td class="code"><pre><span class="line">branch -1    ---&gt;    branch -2</span></pre></td></tr><tr><td class="code"><pre><span class="line">branch -2    merge   staging</span></pre></td></tr><tr><td class="code"><pre><span class="line">branch -2    push    staging</span></pre></td></tr><tr><td class="code"><pre><span class="line">这样branch -2 成了一个受污染分支，但是解决了到staging的冲突</span></pre></td></tr></table></figure>
+
+<h5 id="git-config-配置"><a href="#git-config-配置" class="headerlink" title="git config 配置"></a>git config 配置</h5><p>当我们有多个不同的代码仓库时，不同仓库信息验证不同。比如gitlab和github所验证的git 配置信息不同，若没有配置好则会出现配置信息未更改而被拒绝push</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 查看全局git配置信息</span></pre></td></tr><tr><td class="code"><pre><span class="line">git config --global --list </span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"># 设置全局git使用的账号信息</span></pre></td></tr><tr><td class="code"><pre><span class="line">git config --global user.name &quot;Author Name&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">git config --global user.email &quot;Author Email&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line"># 查看当前项目git配置信息</span></pre></td></tr><tr><td class="code"><pre><span class="line"> git config --list </span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line"># 设置当前项目库配置账号信息</span></pre></td></tr><tr><td class="code"><pre><span class="line">git config user.name &quot;Author Name&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">git config user.email &quot;Author Email&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 设置本次commit的提交账号信息</span></pre></td></tr><tr><td class="code"><pre><span class="line">git commit --amend --author&#x3D;&quot;dengxit &lt;dengxit@gmail.com&gt;&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"># git config 增加别名配置</span></pre></td></tr><tr><td class="code"><pre><span class="line"> git config --global alias.ignore &#39;update-index --skip-worktree&#39;</span></pre></td></tr><tr><td class="code"><pre><span class="line"> git config --global alias.unignore &#39;update-index --no-skip-worktree&#39;</span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line"> git ignore 文件名称</span></pre></td></tr><tr><td class="code"><pre><span class="line"> git unignore 文件名称</span></pre></td></tr><tr><td class="code"><pre><span class="line"> git ls-files -v | grep -i ^S 查看skip-worktree 的文件</span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line"># git config删除某个别名配置</span></pre></td></tr><tr><td class="code"><pre><span class="line"> git config  --global --unset &lt;name&gt;</span></pre></td></tr><tr><td class="code"><pre><span class="line"> git config  --global --unset alias.ignored</span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line"># git config 更改某个别名的设置</span></pre></td></tr><tr><td class="code"><pre><span class="line">git config &lt;name&gt; &quot;value&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">git config remote.origin.url &quot;site.git&quot;</span></pre></td></tr></table></figure>
+
+<h5 id="批量删除本地分支"><a href="#批量删除本地分支" class="headerlink" title="批量删除本地分支"></a>批量删除本地分支</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git branch | grep  &quot;fix&quot; | xargs git branch -d #删除本地名称带 fix 的分支</span></pre></td></tr><tr><td class="code"><pre><span class="line">git branch | grep  &quot;feature&quot; | xargs git branch -d #删除本地名称带 feature 的分支</span></pre></td></tr></table></figure>
+
+<p>详细内容<a href="https://juejin.im/post/5c3b013a5188252580051517" target="_blank" rel="noopener">参考</a></p>
+<h5 id="更新Git"><a href="#更新Git" class="headerlink" title="更新Git"></a>更新Git</h5><ul>
+<li><p><a href="https://git-scm.com/download" target="_blank" rel="noopener">官网下载</a>最新Git</p>
+</li>
+<li><p>Mac brew</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 替换成中科大 brew.git 仓库地址:</span></pre></td></tr><tr><td class="code"><pre><span class="line">cd &quot;$(brew --repo)&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">git remote set-url origin https:&#x2F;&#x2F;mirrors.ustc.edu.cn&#x2F;brew.git</span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="code"><pre><span class="line"># 替换成中科大的 homebrew-core.git 仓库地址:</span></pre></td></tr><tr><td class="code"><pre><span class="line">cd &quot;$(brew --repo)&#x2F;Library&#x2F;Taps&#x2F;homebrew&#x2F;homebrew-core&quot;</span></pre></td></tr><tr><td class="code"><pre><span class="line">git remote set-url origin https:&#x2F;&#x2F;mirrors.ustc.edu.cn&#x2F;homebrew-core.git</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"># 替换成中科大的 homebrew-cask.git 仓库地址:</span></pre></td></tr><tr><td class="code"><pre><span class="line">cd &quot;$(brew --repo)&quot;&#x2F;Library&#x2F;Taps&#x2F;homebrew&#x2F;homebrew-cask</span></pre></td></tr><tr><td class="code"><pre><span class="line">git remote set-url origin https:&#x2F;&#x2F;mirrors.ustc.edu.cn&#x2F;homebrew-cask.git</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">brew upgrade git</span></pre></td></tr></table></figure></li>
+<li><p>apt-get</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">add-apt-repository ppa:git-core&#x2F;ppa</span></pre></td></tr><tr><td class="code"><pre><span class="line">apt-get update</span></pre></td></tr><tr><td class="code"><pre><span class="line">apt-get install -y git</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="Git的-和～"><a href="#Git的-和～" class="headerlink" title="Git的^和～"></a>Git的^和～</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># &lt;rev&gt;~&lt;n&gt; 用来表示一个提交的第 n 个祖先提交，如果不指定 n，那么默认为 1</span></pre></td></tr><tr><td class="code"><pre><span class="line"># &lt;rev&gt;^&lt;n&gt; 用来表示一个提交的第 n 个父提交，如果不指定 n，那么默认为 1</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git log</span></pre></td></tr><tr><td class="code"><pre><span class="line">71033d09 (HEAD)</span></pre></td></tr><tr><td class="code"><pre><span class="line">f3ae6db7 (parents)</span></pre></td></tr><tr><td class="code"><pre><span class="line">b1f73c7d (grandparents)</span></pre></td></tr><tr><td class="code"><pre><span class="line">....</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git rev-parse HEAD  </span></pre></td></tr><tr><td class="code"><pre><span class="line">71033d09</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git rev-parse HEAD~0</span></pre></td></tr><tr><td class="code"><pre><span class="line">71033d09</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git rev-parse HEAD~</span></pre></td></tr><tr><td class="code"><pre><span class="line">f3ae6db7</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git rev-parse HEAD~1</span></pre></td></tr><tr><td class="code"><pre><span class="line">f3ae6db7</span></pre></td></tr><tr><td class="code"><pre><span class="line">#   ~ ^ 的区别</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git log --graph  --oneline</span></pre></td></tr><tr><td class="code"><pre><span class="line">* 0e7410e HEAD</span></pre></td></tr><tr><td class="code"><pre><span class="line">*   441d887 parents-1</span></pre></td></tr><tr><td class="code"><pre><span class="line">|\</span></pre></td></tr><tr><td class="code"><pre><span class="line">| * b43f316 parents-2</span></pre></td></tr><tr><td class="code"><pre><span class="line">|&#x2F;</span></pre></td></tr><tr><td class="code"><pre><span class="line">* 73b8316 parents-3</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git rev-parse HEAD~1</span></pre></td></tr><tr><td class="code"><pre><span class="line">441d887</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git rev-parse HEAD~2</span></pre></td></tr><tr><td class="code"><pre><span class="line">73b8316</span></pre></td></tr><tr><td class="code"><pre><span class="line">$ git rev-parse HEAD~^2</span></pre></td></tr><tr><td class="code"><pre><span class="line">b43f316</span></pre></td></tr><tr><td class="code"><pre><span class="line"># 可以看到parents-1 有两个父提交 parents-2和parents-3</span></pre></td></tr><tr><td class="code"><pre><span class="line">～只能获取祖先提交（可以认为一条直线上的），而要想获得parents-2（分叉上的）就要使用^，本例中parents-2可以理解为：</span></pre></td></tr><tr><td class="code"><pre><span class="line">HEAD的第一个祖先提交（parents-1）的第二个父提交</span></pre></td></tr><tr><td class="code"><pre><span class="line">原文参考：https:&#x2F;&#x2F;scarletsky.github.io&#x2F;2016&#x2F;12&#x2F;29&#x2F;tilde-and-caret-in-git&#x2F;</span></pre></td></tr></table></figure>
+
+
+<h5 id="Git-文件状态"><a href="#Git-文件状态" class="headerlink" title="Git 文件状态"></a>Git 文件状态</h5><img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Git-File-Status-1.png"/>
+
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/Git-File-Status-2.png"/>
+
+
+]]></content>
+      <tags>
+        <tag>Git</tag>
+      </tags>
+  </entry>
+</search>

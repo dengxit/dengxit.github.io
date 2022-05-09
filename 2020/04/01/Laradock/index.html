@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar-favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar-favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dengxitong.com","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Docker Docker官网  Docker Mac 下载">
+<meta name="keywords" content="Docker,Laravel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laradock（Docker+Laravel）">
+<meta property="og:url" content="https:&#x2F;&#x2F;dengxitong.com&#x2F;2020&#x2F;04&#x2F;01&#x2F;Laradock&#x2F;index.html">
+<meta property="og:site_name" content="Dengxit&#39;s Blog">
+<meta property="og:description" content="Docker Docker官网  Docker Mac 下载">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;docker-desktop.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;docker-dev.png">
+<meta property="og:updated_time" content="2022-05-09T07:44:40.500Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-image-1256046195.cos.ap-chengdu.myqcloud.com&#x2F;docker-desktop.png">
+
+<link rel="canonical" href="https://dengxitong.com/2020/04/01/Laradock/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Laradock（Docker+Laravel） | Dengxit's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Dengxit's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dengxitong.com/2020/04/01/Laradock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="dengxit">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dengxit's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laradock（Docker+Laravel）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-01 18:34:27" itemprop="dateCreated datePublished" datetime="2020-04-01T18:34:27+08:00">2020-04-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-05-09 15:44:40" itemprop="dateModified" datetime="2022-05-09T15:44:40+08:00">2022-05-09</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>799</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h5 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h5><ul>
+<li><p><a href="https://www.docker.com/" target="_blank" rel="noopener">Docker官网</a></p>
+</li>
+<li><p><a href="http://download.docker.com/mac/stable/Docker.dmg" target="_blank" rel="noopener">Docker Mac 下载</a></p>
+</li>
+</ul>
+<a id="more"></a>
+
+<ul>
+<li>添加Docker阿里云镜像<code>https://5srh0d9d.mirror.aliyuncs.com</code>，重启Docker </li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/docker-desktop.png" width = 256 />
+
+
+<h5 id="SSH-KEY"><a href="#SSH-KEY" class="headerlink" title="SSH KEY"></a>SSH KEY</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cd ～&#x2F;.ssh</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">#建立的rsa 命名为docker_rsa 以区分</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">cat docker_rsa.pub</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"># 将公钥设置到你的Gitlab或者Github仓库</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"># 将私钥公钥拷贝至后续clone下来的Laradock 的workspace目录下并且更名为insecure_id_rsa和insecure_id_rsa.pub</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">vi ~&#x2F;.ssh&#x2F;config</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">#加入</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">host xxx.com  #git服务商网址  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    identityFile ~&#x2F;.ssh&#x2F;docker_rsa</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    user dengxit@gmail.com #git账号用户名</span></pre></td></tr></table></figure>
+<h5 id="Laradock"><a href="#Laradock" class="headerlink" title="Laradock"></a>Laradock</h5><ul>
+<li><p><a href="http://laradock.io/" target="_blank" rel="noopener">Laradock 官网</a></p>
+</li>
+<li><p><code>git clone https://github.com/Laradock/laradock.git</code></p>
+</li>
+<li><p>clone下来的项目内有非常多的相关环境目录，只保留Laravel运行环境必要的即可</p>
+</li>
+</ul>
+<img src="https://blog-image-1256046195.cos.ap-chengdu.myqcloud.com/docker-dev.png" width = 256 />
+
+<h5 id="Laradock-env配置"><a href="#Laradock-env配置" class="headerlink" title="Laradock env配置"></a>Laradock env配置</h5><p><a href="https://github.com/laradock/laradock/blob/master/env-example" target="_blank" rel="noopener">官方ENV</a></p>
+<p>保留我们留下来的相关配置即可，根据自己本地或服务器情况进行相应设置，详情可参考<a href="https://laradock.io/documentation/" target="_blank" rel="noopener">Laradock文档</a></p>
+<p>注意</p>
+<ul>
+<li><p>将“APP_CODE_PATH_HOST=~/GIT”的GIT改为本地项目所在地址或者上一层目录，本地的所有以Docker运行的项目放在次目录下即可</p>
+</li>
+<li><p>设置镜像<br>WORKSPACE_COMPOSER_REPO_PACKAGIST=<a href="https://mirrors.aliyun.com/composer/" target="_blank" rel="noopener">https://mirrors.aliyun.com/composer/</a><br>WORKSPACE_NPM_REGISTRY=<a href="https://registry.npm.taobao.org" target="_blank" rel="noopener">https://registry.npm.taobao.org</a><br>WORKSPACE_NVM_NODEJS_ORG_MIRROR=<a href="https://npm.taobao.org/mirrors/node" target="_blank" rel="noopener">https://npm.taobao.org/mirrors/node</a></p>
+</li>
+</ul>
+<h5 id="docker-compose"><a href="#docker-compose" class="headerlink" title="docker-compose"></a>docker-compose</h5><ul>
+<li>配置项目的docker-compose.yaml文件 （同env 保留我们留下来的目录配置即可）<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker-compose build #build镜像</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker-compose up -d #start</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">docker ps  #查看build后启动的镜像</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="Laravel站点设置"><a href="#Laravel站点设置" class="headerlink" title="Laravel站点设置"></a>Laravel站点设置</h5><ul>
+<li><p>在docker项目nginx/sites下新增项目配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cp laravel.conf.example demo.conf</span></pre></td></tr></table></figure>
+</li>
+<li><p>修改 conf </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">server_name laravel.test;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">root &#x2F;var&#x2F;www&#x2F;laravel项目路径&#x2F;public;</span></pre></td></tr></table></figure>
+</li>
+<li><p>本地hosts增加</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">127.0.0.1 laravel.test</span></pre></td></tr></table></figure>
+</li>
+<li><p>Laravel env 设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">将项目的DBHOST改为mysql，REDISHOST改为redis，密码改成docker redis中对应密码</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="Docker-Workspace"><a href="#Docker-Workspace" class="headerlink" title="Docker Workspace"></a>Docker Workspace</h5><p>通过 ssh root@localhost -p 2222连接到workspace中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cd &#x2F;var&#x2F;www </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ll  #在容器中查看项目</span></pre></td></tr></table></figure>
+
+<h5 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">No containsers to start ，无容器可启动</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span></pre></td></tr></table></figure>
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Starting nginx            ... error</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">netstat -an | grep 80查看80端口，关闭本机运行中的nginx</span></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql端口占用</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker中的mysql和本地mysql服务共同占用了3306端口，将env中端口号改为8306</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">执行docker-compose up -d --force-recreate --no-deps mysql</span></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">composer install 时提示版本问题</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">将env中的PHP_VERSION&#x3D;改成需要的版本，rebuild</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">或者是配置多个workspace 每个workspace中采用不同的php版本</span></pre></td></tr></table></figure>
+
+<h5 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h5><p><a href="https://www.cnblogs.com/liubin0509/p/6178351.html" target="_blank" rel="noopener">compose命令详解</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">--force-recreate       强制重新创建compose服务，即使没有任何改变。重新创建后启动容器</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">--no-deps             不启动link服务，只启动指定的服务.</span></pre></td></tr></table></figure>
+
+
+<h5 id="多个workspace配置"><a href="#多个workspace配置" class="headerlink" title="多个workspace配置"></a>多个workspace配置</h5><p>当项目变多，并且出现各种不同版本的PHP运行环境时，可以配置多个workspace，每个采用不同的环境设置。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/27/Sentry-Laravel-Gitlab/" rel="prev" title="Sentry-Laravel-Gitlab">
+      <i class="fa fa-chevron-left"></i> Sentry-Laravel-Gitlab
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/02/php-cs-fixer-husky/" rel="next" title="Php-Cs-Fixer+Husky">
+      Php-Cs-Fixer+Husky <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#Docker"><span class="nav-number">1.</span> <span class="nav-text">Docker</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SSH-KEY"><span class="nav-number">2.</span> <span class="nav-text">SSH KEY</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Laradock"><span class="nav-number">3.</span> <span class="nav-text">Laradock</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Laradock-env配置"><span class="nav-number">4.</span> <span class="nav-text">Laradock env配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#docker-compose"><span class="nav-number">5.</span> <span class="nav-text">docker-compose</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Laravel站点设置"><span class="nav-number">6.</span> <span class="nav-text">Laravel站点设置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Docker-Workspace"><span class="nav-number">7.</span> <span class="nav-text">Docker Workspace</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#常见问题"><span class="nav-number">8.</span> <span class="nav-text">常见问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#相关链接"><span class="nav-number">9.</span> <span class="nav-text">相关链接</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多个workspace配置"><span class="nav-number">10.</span> <span class="nav-text">多个workspace配置</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dengxit"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">dengxit</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dengxit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dengxit" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:dengxit@gmail.com" title="E-Mail → mailto:dengxit@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dengxit</span>
+</div>
+<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">琼ICP备18000684号-2</a>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
